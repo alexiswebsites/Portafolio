@@ -1,39 +1,11 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Portafolio web — Miguel Alexis Sánchez Carranza
 
-## Getting Started
+Portafolio personal desarrollado para presentar mis proyectos, mostrar mis habilidades en desarrollo web y dar a conocer mis servicios.
 
-First, run the development server:
+El sitio incluye información sobre mí, las tecnologías con las que trabajo y una selección de proyectos realizados para clientes y proyectos propios. Entre ellos se encuentra **QuickCart**, una tienda online de demostración integrada en el portafolio, con catálogo de productos, carrito de compras y flujo de pedido simulado.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+También cuenta con una sección para presentar mis servicios y medios de contacto para personas interesadas en trabajar conmigo.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Sitio web
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-Forzando deploy a Vercel Thu Feb 26 21:14:40     2026
-Forzando deploy a Vercel Thu Feb 26 21:17:06     2026
-// redeploy
+https://alexissanchez.vercel.app/
