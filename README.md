@@ -8,4 +8,4 @@ También cuenta con una sección para presentar mis servicios y medios de contac
 
 ## Sitio web
 
-https://alexissanchez.vercel.app/
+https://alexissanchez.vercel.app
