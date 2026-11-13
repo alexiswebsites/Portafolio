@@ -3,62 +3,34 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
-const cardStartClasses = [
-  "-translate-x-6 rotate-[-1.5deg]",
-  "translate-x-6 rotate-[1.5deg]",
-  "-translate-x-6 rotate-[-1.5deg]",
-  "translate-x-6 rotate-[1.5deg]",
-];
-
 function BiNeBianniDivider({ position }) {
   const posicion =
     position === "top"
-      ? "top-0 -translate-x-1/2 -translate-y-1/2"
-      : "bottom-0 -translate-x-1/2 translate-y-1/2";
-
-  const ancho =
-    position === "top"
-      ? "w-full max-w-none"
-      : "w-[calc(100%-2.5rem)] max-w-[420px]";
+      ? "top-0 -translate-y-1/2"
+      : "bottom-0 translate-y-1/2";
 
   return (
     <div
       aria-hidden="true"
       className={`
-        pointer-events-none absolute left-1/2 z-20
-        flex items-center justify-center gap-0
-        ${ancho}
+        pointer-events-none absolute left-0 z-20
+        flex w-full items-center justify-center gap-0
         ${posicion}
       `}
     >
-      <span
-        className="
-          h-px flex-1
-          bg-gradient-to-r
-          from-transparent
-          via-[#a78bfa]/80
-          to-[#a78bfa]/40
-        "
-      />
+      <span className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-black/10" />
 
       <span
         className="
           h-2.5 w-2.5 shrink-0 rotate-45
           rounded-[2px]
-          bg-[#a78bfa]
-          shadow-[0_0_18px_rgba(167,139,250,0.75)]
+          border border-black/10
+          bg-white/90
+          shadow-[0_1px_5px_rgba(0,0,0,0.12)]
         "
       />
 
-      <span
-        className="
-          h-px flex-1
-          bg-gradient-to-l
-          from-transparent
-          via-[#a78bfa]/80
-          to-[#a78bfa]/40
-        "
-      />
+      <span className="h-px flex-1 bg-gradient-to-l from-transparent via-black/15 to-black/10" />
     </div>
   );
 }
@@ -85,12 +57,6 @@ export default function ProjectsSection() {
       return;
     }
 
-    /*
-      Encabezado de la sección.
-
-      Se anima una sola vez y después deja de observarse,
-      por lo que no vuelve a ocultarse al subir o bajar.
-    */
     const sectionObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
@@ -104,12 +70,6 @@ export default function ProjectsSection() {
       },
     );
 
-    /*
-      Cada proyecto se anima al entrar en pantalla.
-
-      Después de mostrarse se deja de observar para evitar
-      parpadeos o repeticiones de la animación.
-    */
     const cardsObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -118,9 +78,7 @@ export default function ProjectsSection() {
           const index = Number(entry.target.dataset.cardIndex);
 
           setVisibleCards((previousCards) => {
-            if (previousCards.has(index)) {
-              return previousCards;
-            }
+            if (previousCards.has(index)) return previousCards;
 
             const nextCards = new Set(previousCards);
             nextCards.add(index);
@@ -140,9 +98,7 @@ export default function ProjectsSection() {
     sectionObserver.observe(section);
 
     cardRefs.current.forEach((card) => {
-      if (card) {
-        cardsObserver.observe(card);
-      }
+      if (card) cardsObserver.observe(card);
     });
 
     return () => {
@@ -153,6 +109,13 @@ export default function ProjectsSection() {
 
   const cardAnimationClass = (index) => {
     const cardVisible = visibleCards.has(index);
+
+    const initialPosition = [
+      "-translate-x-6 rotate-[-1.5deg]",
+      "translate-x-6 rotate-[1.5deg]",
+      "-translate-x-6 rotate-[-1.5deg]",
+      "translate-x-6 rotate-[1.5deg]",
+    ];
 
     return `
       h-full min-w-0 transform-gpu
@@ -166,10 +129,49 @@ export default function ProjectsSection() {
       ${
         cardVisible
           ? "translate-x-0 translate-y-0 scale-100 rotate-0 opacity-100"
-          : `${cardStartClasses[index]} translate-y-10 scale-[0.93] opacity-0`
+          : `${initialPosition[index]} translate-y-10 scale-[0.93] opacity-0`
       }
     `;
   };
+
+  const cardStyle = `
+    group block h-full w-full
+    cursor-pointer
+    rounded-2xl
+    border border-white/80
+    bg-white/65 backdrop-blur-xl
+    p-5
+    shadow-[0_8px_30px_rgba(0,0,0,0.045)]
+    transition-[transform,border-color,background-color,box-shadow]
+    duration-300
+    active:scale-[0.985]
+    sm:hover:-translate-y-1
+    sm:hover:border-black/10
+    sm:hover:bg-white/90
+    md:p-7
+  `;
+
+  const categoryStyle = `
+    shrink-0 rounded-full
+    border border-black/10
+    bg-white/70
+    px-3 py-1
+    text-xs text-[#6e6e73]
+  `;
+
+  const titleStyle = "text-lg font-medium text-[#1d1d1f]";
+
+  const descriptionStyle =
+    "mt-3 text-sm leading-relaxed text-[#424245] md:text-base";
+
+  const linkStyle = `
+    mt-5 inline-block
+    text-sm font-medium text-[#1d1d1f]
+    transition-[color,transform]
+    duration-300
+    group-hover:translate-x-1
+    group-hover:text-black
+  `;
 
   return (
     <section
@@ -178,48 +180,34 @@ export default function ProjectsSection() {
       className="
         relative scroll-mt-[90px]
         overflow-visible
-        bg-[#100817]
+        bg-[#f5f5f7] text-[#1d1d1f]
         px-5 py-12
         md:px-6 md:py-16
       "
     >
-      {/*
-        Fondo estático.
+      <BiNeBianniDivider position="top" />
 
-        No usa blur gigante, opacity animada ni transformaciones.
-        Mantiene el resplandor morado sin provocar flashes en móvil.
-      */}
       <div
         aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute inset-0
-          overflow-hidden
-        "
+        className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <div
           className="
             absolute inset-0
-            bg-[radial-gradient(circle_at_100%_18%,rgba(124,58,237,0.13),transparent_34%),radial-gradient(circle_at_0%_88%,rgba(147,51,234,0.055),transparent_30%)]
+            bg-[radial-gradient(circle_at_100%_18%,rgba(0,0,0,0.045),transparent_34%),radial-gradient(circle_at_0%_88%,rgba(0,0,0,0.025),transparent_30%)]
           "
         />
       </div>
 
       <div className="relative mx-auto max-w-6xl">
+        {/* ENCABEZADO */}
         <div className="max-w-2xl">
           <p
             className={`
-              transform-gpu
-              text-xs uppercase
-              tracking-[0.18em]
-              text-[#c4b5fd]/55
-              transition-[opacity,transform]
-              duration-700
+              transform-gpu text-xs uppercase tracking-[0.18em]
+              text-[#86868b]
+              transition-[opacity,transform] duration-700
               ease-[cubic-bezier(0.16,1,0.3,1)]
-              [backface-visibility:hidden]
-              motion-reduce:transform-none
-              motion-reduce:opacity-100
-              motion-reduce:transition-none
               md:text-sm
               ${
                 sectionVisible
@@ -235,14 +223,9 @@ export default function ProjectsSection() {
             className={`
               mt-3 origin-left transform-gpu
               text-2xl font-semibold
-              transition-[opacity,transform]
-              delay-[90ms]
+              transition-[opacity,transform] delay-[90ms]
               duration-[850ms]
               ease-[cubic-bezier(0.16,1,0.3,1)]
-              [backface-visibility:hidden]
-              motion-reduce:transform-none
-              motion-reduce:opacity-100
-              motion-reduce:transition-none
               md:text-4xl
               ${
                 sectionVisible
@@ -256,17 +239,11 @@ export default function ProjectsSection() {
 
           <p
             className={`
-              mt-4 transform-gpu
-              text-sm leading-relaxed
-              text-white/55
-              transition-[opacity,transform]
-              delay-[190ms]
+              mt-4 transform-gpu text-sm leading-relaxed
+              text-[#424245]
+              transition-[opacity,transform] delay-[190ms]
               duration-[750ms]
               ease-[cubic-bezier(0.16,1,0.3,1)]
-              [backface-visibility:hidden]
-              motion-reduce:transform-none
-              motion-reduce:opacity-100
-              motion-reduce:transition-none
               md:text-base
               ${
                 sectionVisible
@@ -280,8 +257,9 @@ export default function ProjectsSection() {
           </p>
         </div>
 
+        {/* PROYECTOS */}
         <div className="mt-7 grid gap-4 md:mt-8 md:grid-cols-2 md:gap-6">
-          {/* QUICKCART */}
+          {/* 1. MODO DE VIAJE */}
           <div
             ref={(element) => {
               cardRefs.current[0] = element;
@@ -292,53 +270,34 @@ export default function ProjectsSection() {
               transitionDelay: visibleCards.has(0) ? "0ms" : "0ms",
             }}
           >
-            <article
-              className="
-                group h-full
-                rounded-2xl
-                border border-[#c4b5fd]/10
-                bg-[#190d25]
-                p-5
-                shadow-[0_20px_60px_rgba(0,0,0,0.15)]
-                transition-[transform,border-color,background-color,box-shadow]
-                duration-300
-                active:scale-[0.985]
-                sm:hover:-translate-y-1
-                sm:hover:border-[#a78bfa]/25
-                sm:hover:bg-[#20102f]
-                md:p-7
-              "
+            <a
+              href="https://mododeviaje.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visitar Modo de Viaje"
+              className={cardStyle}
             >
               <div className="flex items-center justify-between gap-4">
-                <h3 className="text-lg font-medium">QuickCart</h3>
+                <h3 className={titleStyle}>Modo de Viaje</h3>
 
-                <span className="shrink-0 rounded-full border border-[#c4b5fd]/15 bg-[#8b5cf6]/5 px-3 py-1 text-xs text-[#ddd6fe]/60">
-                  Tienda online
+                <span className={categoryStyle}>
+                  Sitio web
                 </span>
               </div>
 
-              <p className="mt-3 text-sm leading-relaxed text-white/60 md:text-base">
-                Tienda online de demostración con catálogo de productos,
-                carrito de compras y flujo de pedido simulado.
+              <p className={descriptionStyle}>
+                Descripción provisional del proyecto. Aquí podrás agregar
+                información sobre el sitio web, sus funcionalidades y el
+                trabajo realizado.
               </p>
 
-              <Link
-                href="/quickcart"
-                className="
-                  mt-5 inline-block cursor-pointer
-                  text-sm font-medium text-[#c4b5fd]
-                  transition-[color,transform]
-                  duration-300
-                  hover:translate-x-1
-                  hover:text-white
-                "
-              >
-                Ver proyecto →
-              </Link>
-            </article>
+              <span className={linkStyle}>
+                Visitar sitio →
+              </span>
+            </a>
           </div>
 
-          {/* BI NE BIANNI */}
+          {/* 2. HAMBURGUESAS FÁTIMA */}
           <div
             ref={(element) => {
               cardRefs.current[1] = element;
@@ -349,55 +308,36 @@ export default function ProjectsSection() {
               transitionDelay: visibleCards.has(1) ? "80ms" : "0ms",
             }}
           >
-            <article
-              className="
-                group h-full
-                rounded-2xl
-                border border-[#c4b5fd]/10
-                bg-[#190d25]
-                p-5
-                shadow-[0_20px_60px_rgba(0,0,0,0.15)]
-                transition-[transform,border-color,background-color,box-shadow]
-                duration-300
-                active:scale-[0.985]
-                sm:hover:-translate-y-1
-                sm:hover:border-[#a78bfa]/25
-                sm:hover:bg-[#20102f]
-                md:p-7
-              "
+            <a
+              href="https://hamburguesas-fatima.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visitar Hamburguesas Fátima"
+              className={cardStyle}
             >
               <div className="flex items-center justify-between gap-4">
-                <h3 className="text-lg font-medium">Bi Ne Bianni</h3>
+                <h3 className={titleStyle}>
+                  Hamburguesas Fátima
+                </h3>
 
-                <span className="shrink-0 rounded-full border border-[#c4b5fd]/15 bg-[#8b5cf6]/5 px-3 py-1 text-xs text-[#ddd6fe]/60">
-                  Sitio empresarial
+                <span className={categoryStyle}>
+                  Restaurante
                 </span>
               </div>
 
-              <p className="mt-3 text-sm leading-relaxed text-white/60 md:text-base">
-                Sitio web para una consultoría social, con secciones
-                informativas, presentación de servicios y diseño moderno.
+              <p className={descriptionStyle}>
+                Página web para negocio de comida, enfocada en mostrar un
+                menú digital con carrito, recibir pedidos a domicilio por
+                WhatsApp y facilitar la atención directa con clientes.
               </p>
 
-              <a
-                href="https://binebianni.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="
-                  mt-5 inline-block cursor-pointer
-                  text-sm font-medium text-[#c4b5fd]
-                  transition-[color,transform]
-                  duration-300
-                  hover:translate-x-1
-                  hover:text-white
-                "
-              >
-                Ver sitio →
-              </a>
-            </article>
+              <span className={linkStyle}>
+                Visitar sitio →
+              </span>
+            </a>
           </div>
 
-          {/* HAMBURGUESAS FÁTIMA */}
+          {/* 3. BI NE BIANNI */}
           <div
             ref={(element) => {
               cardRefs.current[2] = element;
@@ -408,58 +348,33 @@ export default function ProjectsSection() {
               transitionDelay: visibleCards.has(2) ? "80ms" : "0ms",
             }}
           >
-            <article
-              className="
-                group h-full
-                rounded-2xl
-                border border-[#c4b5fd]/10
-                bg-[#190d25]
-                p-5
-                shadow-[0_20px_60px_rgba(0,0,0,0.15)]
-                transition-[transform,border-color,background-color,box-shadow]
-                duration-300
-                active:scale-[0.985]
-                sm:hover:-translate-y-1
-                sm:hover:border-[#a78bfa]/25
-                sm:hover:bg-[#20102f]
-                md:p-7
-              "
+            <a
+              href="https://binebianni.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visitar Bi Ne Bianni"
+              className={cardStyle}
             >
               <div className="flex items-center justify-between gap-4">
-                <h3 className="text-lg font-medium">
-                  Hamburguesas Fátima
-                </h3>
+                <h3 className={titleStyle}>Bi Ne Bianni</h3>
 
-                <span className="shrink-0 rounded-full border border-[#c4b5fd]/15 bg-[#8b5cf6]/5 px-3 py-1 text-xs text-[#ddd6fe]/60">
-                  Restaurante
+                <span className={categoryStyle}>
+                  Sitio empresarial
                 </span>
               </div>
 
-              <p className="mt-3 text-sm leading-relaxed text-white/60 md:text-base">
-                Página web para negocio de comida, enfocada en mostrar un
-                menú digital con carrito, recibir pedidos a domicilio por
-                WhatsApp y facilitar la atención directa con clientes.
+              <p className={descriptionStyle}>
+                Sitio web para una consultoría social, con secciones
+                informativas, presentación de servicios y diseño moderno.
               </p>
 
-              <a
-                href="https://hamburguesas-fatima.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="
-                  mt-5 inline-block cursor-pointer
-                  text-sm font-medium text-[#c4b5fd]
-                  transition-[color,transform]
-                  duration-300
-                  hover:translate-x-1
-                  hover:text-white
-                "
-              >
-                Ver sitio →
-              </a>
-            </article>
+              <span className={linkStyle}>
+                Visitar sitio →
+              </span>
+            </a>
           </div>
 
-          {/* PRÓXIMO PROYECTO */}
+          {/* 4. QUICKCART */}
           <div
             ref={(element) => {
               cardRefs.current[3] = element;
@@ -470,52 +385,32 @@ export default function ProjectsSection() {
               transitionDelay: visibleCards.has(3) ? "80ms" : "0ms",
             }}
           >
-            <article
-              className="
-                group h-full
-                rounded-2xl
-                border border-[#c4b5fd]/10
-                bg-[#190d25]
-                p-5
-                shadow-[0_20px_60px_rgba(0,0,0,0.15)]
-                transition-[transform,border-color,background-color,box-shadow]
-                duration-300
-                active:scale-[0.985]
-                sm:hover:-translate-y-1
-                sm:hover:border-[#a78bfa]/25
-                sm:hover:bg-[#20102f]
-                md:p-7
-              "
+            <Link
+              href="/quickcart"
+              aria-label="Visitar QuickCart"
+              className={cardStyle}
             >
               <div className="flex items-center justify-between gap-4">
-                <h3 className="text-lg font-medium">
-                  Próximo proyecto
-                </h3>
+                <h3 className={titleStyle}>QuickCart</h3>
 
-                <span className="shrink-0 rounded-full border border-[#c4b5fd]/15 bg-[#8b5cf6]/5 px-3 py-1 text-xs text-[#ddd6fe]/60">
-                  En desarrollo
+                <span className={categoryStyle}>
+                  Tienda online
                 </span>
               </div>
 
-              <p className="mt-3 text-sm leading-relaxed text-white/60 md:text-base">
-                Estoy trabajando en nuevos proyectos para ampliar mi
-                portafolio y mostrar más tipos de páginas y sistemas.
+              <p className={descriptionStyle}>
+                Tienda online de demostración con catálogo de productos,
+                carrito de compras y flujo de pedido simulado.
               </p>
 
-              <span className="mt-5 inline-block text-sm text-[#c4b5fd]/40">
-                Proyecto en desarrollo →
+              <span className={linkStyle}>
+                Ver proyecto →
               </span>
-            </article>
+            </Link>
           </div>
         </div>
       </div>
 
-      {/*
-        Separador siempre visible.
-
-        No depende del IntersectionObserver, por lo que no aparece
-        repentinamente ni genera flashes al entrar en la sección.
-      */}
       <BiNeBianniDivider position="bottom" />
     </section>
   );

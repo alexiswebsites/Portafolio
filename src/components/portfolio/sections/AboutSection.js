@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -7,7 +8,7 @@ const technologies = [
     name: "Next.js",
     type: "Framework",
     description: "Sitios rápidos y optimizados.",
-    color: "bg-white",
+    color: "bg-[#000000]",
   },
   {
     name: "React",
@@ -49,7 +50,7 @@ const technologies = [
     name: "Vercel",
     type: "Despliegue",
     description: "Publicación rápida de proyectos.",
-    color: "bg-white",
+    color: "bg-[#000000]",
   },
 ];
 
@@ -75,14 +76,6 @@ const cardDelayClasses = [
   "delay-[90ms]",
 ];
 
-/*
-  El separador ya no depende del IntersectionObserver.
-
-  Antes cambiaba de opacity-0 a opacity-100 y de scale-x-0 a scale-x-100.
-  Eso provocaba el flash cuando la sección comenzaba a observarse.
-
-  Ahora conserva exactamente el mismo diseño, pero siempre permanece visible.
-*/
 function BiNeBianniDivider({ position }) {
   const posicion =
     position === "top"
@@ -102,15 +95,16 @@ function BiNeBianniDivider({ position }) {
         className="
           h-px flex-1
           bg-gradient-to-r
-          from-transparent via-[#a78bfa]/80 to-[#a78bfa]/40
+          from-transparent via-black/15 to-transparent
         "
       />
 
       <span
         className="
           h-2.5 w-2.5 shrink-0 rotate-45
-          rounded-[2px] bg-[#a78bfa]
-          shadow-[0_0_14px_rgba(167,139,250,0.65)]
+          rounded-[3px] border border-black/10
+          bg-white/90 backdrop-blur-md
+          shadow-[0_1px_5px_rgba(0,0,0,0.12)]
         "
       />
 
@@ -118,7 +112,7 @@ function BiNeBianniDivider({ position }) {
         className="
           h-px flex-1
           bg-gradient-to-l
-          from-transparent via-[#a78bfa]/80 to-[#a78bfa]/40
+          from-transparent via-black/15 to-transparent
         "
       />
     </div>
@@ -148,16 +142,9 @@ export default function AboutSection() {
       setVisible(true);
       setToolsVisible(true);
       setVisibleCards(new Set(technologies.map((_, index) => index)));
-
       return;
     }
 
-    /*
-      La animación principal solo se activa una vez.
-
-      Cuando entra en pantalla se desconecta el observer,
-      por lo que nunca vuelve a ocultarse al subir o bajar.
-    */
     const sectionObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
@@ -171,9 +158,6 @@ export default function AboutSection() {
       },
     );
 
-    /*
-      La sección de tecnologías también se activa solamente una vez.
-    */
     const toolsObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
@@ -187,12 +171,6 @@ export default function AboutSection() {
       },
     );
 
-    /*
-      Cada tarjeta se anima cuando aparece por primera vez.
-
-      Después se deja de observar para evitar que vuelva a desaparecer
-      y aparezca cuando el usuario cambie la dirección del scroll.
-    */
     const cardsObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -244,29 +222,21 @@ export default function AboutSection() {
       ref={sectionRef}
       className="
         relative overflow-visible
-        bg-[#140a1f]
+        bg-[#f5f5f7] text-[#1d1d1f]
         px-4 py-10
         sm:px-5 sm:py-12
         md:px-6 md:py-16
       "
     >
-      {/* Separador fijo: ya no aparece repentinamente */}
       <BiNeBianniDivider position="top" />
 
-      {/*
-        Mismo blur decorativo original.
-
-        Antes tenía opacity y transform ligados a la variable visible.
-        Eso hacía que apareciera de golpe y cambiara el color del fondo.
-
-        Ahora permanece estático desde el primer render.
-      */}
+      {/* Soft glass background */}
       <div
         aria-hidden="true"
         className="
           pointer-events-none absolute -left-40 bottom-0
           hidden h-80 w-80 rounded-full
-          bg-[#9333ea]/10 blur-[100px]
+          bg-white/70 blur-[100px]
           sm:block
         "
       />
@@ -275,7 +245,7 @@ export default function AboutSection() {
         <p
           className={`
             transform-gpu text-xs uppercase
-            tracking-[0.18em] text-[#c4b5fd]/55
+            tracking-[0.18em] text-[#86868b]
             transition-[opacity,transform]
             duration-700
             ease-[cubic-bezier(0.16,1,0.3,1)]
@@ -317,7 +287,7 @@ export default function AboutSection() {
         <p
           className={`
             mt-4 max-w-3xl transform-gpu
-            text-[15px] leading-relaxed text-white/70
+            text-[15px] leading-relaxed text-[#424245]
             transition-[opacity,transform]
             delay-[230ms] duration-[750ms]
             ease-[cubic-bezier(0.16,1,0.3,1)]
@@ -339,7 +309,7 @@ export default function AboutSection() {
         <p
           className={`
             mt-3 max-w-3xl transform-gpu
-            text-sm leading-relaxed text-white/60
+            text-sm leading-relaxed text-[#6e6e73]
             transition-[opacity,transform]
             delay-[330ms] duration-[750ms]
             ease-[cubic-bezier(0.16,1,0.3,1)]
@@ -362,7 +332,7 @@ export default function AboutSection() {
         <p
           className={`
             mt-3 max-w-3xl transform-gpu
-            text-sm leading-relaxed text-white/60
+            text-sm leading-relaxed text-[#6e6e73]
             transition-[opacity,transform]
             delay-[430ms] duration-[750ms]
             ease-[cubic-bezier(0.16,1,0.3,1)]
@@ -398,7 +368,7 @@ export default function AboutSection() {
               }
             `}
           >
-            <p className="text-xs uppercase tracking-[0.18em] text-[#c4b5fd]/55">
+            <p className="text-xs uppercase tracking-[0.18em] text-[#86868b]">
               Tecnologías y herramientas
             </p>
 
@@ -438,16 +408,18 @@ export default function AboutSection() {
                     className="
                       group relative h-full min-w-0
                       overflow-hidden rounded-xl
-                      border border-[#c4b5fd]/10
-                      bg-[#190d25]/80 p-3
+                      border border-white/80
+                      bg-white/65 p-3
+                      shadow-[0_8px_30px_rgba(0,0,0,0.045)]
+                      backdrop-blur-xl
                       transform-gpu
                       transition-[transform,border-color,background-color]
                       duration-300
                       active:scale-[0.98]
                       sm:rounded-2xl sm:p-4
                       sm:hover:-translate-y-1
-                      sm:hover:border-[#a78bfa]/30
-                      sm:hover:bg-[#20102f]
+                      sm:hover:border-black/10
+                      sm:hover:bg-white/90
                       md:p-5
                     "
                   >
@@ -473,31 +445,31 @@ export default function AboutSection() {
                       />
 
                       <div className="min-w-0">
-                        <h4 className="truncate text-sm font-medium text-white sm:text-base">
+                        <h4 className="truncate text-sm font-medium text-[#1d1d1f] sm:text-base">
                           {technology.name}
                         </h4>
 
-                        <p className="mt-0.5 truncate text-[10px] text-[#c4b5fd]/55 sm:text-xs">
+                        <p className="mt-0.5 truncate text-[10px] text-[#86868b] sm:text-xs">
                           {technology.type}
                         </p>
                       </div>
                     </div>
 
-                    <p className="mt-2 break-words text-[11px] leading-relaxed text-white/55 sm:mt-3 sm:text-sm">
+                    <p className="mt-2 break-words text-[11px] leading-relaxed text-[#6e6e73] sm:mt-3 sm:text-sm">
                       {technology.description}
                     </p>
 
-                    {/* Mismo efecto decorativo original */}
+                    {/* Subtle glass highlight */}
                     <div
                       aria-hidden="true"
                       className="
                         pointer-events-none absolute -right-8 -top-8
                         hidden h-20 w-20 rounded-full
-                        bg-[#8b5cf6]/10 blur-2xl
+                        bg-white/60 blur-2xl
                         transition-[transform,background-color]
                         duration-500
                         group-hover:scale-125
-                        group-hover:bg-[#8b5cf6]/20
+                        group-hover:bg-white/90
                         sm:block
                       "
                     />
@@ -509,7 +481,6 @@ export default function AboutSection() {
         </div>
       </div>
 
-      {/* Separador fijo: ya no depende de toolsVisible */}
       <BiNeBianniDivider position="bottom" />
     </section>
   );

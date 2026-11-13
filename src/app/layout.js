@@ -1,31 +1,36 @@
+
 import "./globals.css";
 
 import AppProvider from "@/components/AppProvider";
 
-const title = "QuickCart | Miguel Alexis Sánchez Carranza";
+const title = "Portafolio | Miguel Alexis Sánchez Carranza";
 
 const description =
-  "Portafolio y tienda online de demostración con carrito y experiencia de compra sin ventas reales.";
+  "Portafolio de Miguel Alexis Sánchez Carranza, desarrollador web Full Stack. Explora mis proyectos y experiencia en desarrollo web.";
 
 export const metadata = {
+  metadataBase: new URL("https://alexissanchez.vercel.app"),
+
   title,
   description,
 
   icons: {
-    icon: "/icone.png",
+    icon: "/alexiswebsites.png",
   },
 
   openGraph: {
     title,
     description,
     url: "https://alexissanchez.vercel.app",
+    siteName: "Miguel Alexis Sánchez Carranza",
+    locale: "es_MX",
     type: "website",
     images: [
       {
-        url: "https://alexissanchez.vercel.app/iconooo.png",
+        url: "/alexiswebsites.png",
         width: 1200,
         height: 630,
-        alt: "QuickCart",
+        alt: "Miguel Alexis Sánchez Carranza | Desarrollador Web Full Stack",
       },
     ],
   },
@@ -34,7 +39,7 @@ export const metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: ["https://alexissanchez.vercel.app/iconooo.png"],
+    images: ["/alexiswebsites.png"],
   },
 };
 

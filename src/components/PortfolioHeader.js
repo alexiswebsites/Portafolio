@@ -1,10 +1,10 @@
+
 "use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 
-const whatsappMessage =
-  "";
+const whatsappMessage = "";
 
 const whatsappUrl = `https://wa.me/5213312891927?text=${encodeURIComponent(
   whatsappMessage,
@@ -131,9 +131,9 @@ export default function PortfolioHeader() {
         ${
           scrolleado
             ? `
-                bg-[#241336]/75
-                shadow-[0_10px_35px_rgba(5,2,10,0.28)]
-                supports-[backdrop-filter]:bg-[#241336]/65
+                bg-white/75
+                shadow-[0_10px_35px_rgba(0,0,0,0.08)]
+                supports-[backdrop-filter]:bg-white/65
                 supports-[backdrop-filter]:backdrop-blur-xl
               `
             : `
@@ -145,6 +145,7 @@ export default function PortfolioHeader() {
       `}
     >
       <div className="relative mx-auto flex h-[74px] w-full max-w-6xl items-center justify-between gap-2 px-3 sm:h-[70px] sm:gap-3 sm:px-5 md:px-6">
+
         {/* Nombre */}
         <button
           type="button"
@@ -171,12 +172,12 @@ export default function PortfolioHeader() {
                 : "transition-none"
             }
 
-            hover:bg-purple-400/[0.07]
+            hover:bg-black/[0.04]
             active:scale-[0.97]
 
             ${
               presionado === "nombre"
-                ? "scale-[0.97] bg-purple-400/[0.1]"
+                ? "scale-[0.97] bg-black/[0.06]"
                 : ""
             }
           `}
@@ -187,7 +188,7 @@ export default function PortfolioHeader() {
             className={`
               pointer-events-none absolute bottom-[3px] left-1/2
               h-px w-0 -translate-x-1/2 rounded-full
-              bg-[#c4b5fd] opacity-0
+              bg-gray-500 opacity-0
 
               ${
                 animacionesActivas
@@ -205,12 +206,13 @@ export default function PortfolioHeader() {
           />
 
           <span className="relative block leading-[1.05]">
+
             {/* Nombre en celular */}
-            <span className="block whitespace-nowrap text-[15px] font-bold tracking-wide text-white min-[390px]:text-[16px] sm:hidden">
+            <span className="block whitespace-nowrap text-[15px] font-bold tracking-wide text-black min-[390px]:text-[16px] sm:hidden">
               Miguel Alexis
             </span>
 
-            <span className="mt-0.5 block whitespace-nowrap text-[15px] font-bold tracking-wide text-white/80 min-[390px]:text-[16px] sm:hidden">
+            <span className="mt-0.5 block whitespace-nowrap text-[15px] font-bold tracking-wide text-black/70 min-[390px]:text-[16px] sm:hidden">
               Sánchez Carranza
             </span>
 
@@ -218,7 +220,7 @@ export default function PortfolioHeader() {
             <span
               className={`
                 hidden whitespace-nowrap text-[15px]
-                font-semibold tracking-wide text-white
+                font-semibold tracking-wide text-black
                 sm:block md:text-[16px]
 
                 ${
@@ -227,7 +229,7 @@ export default function PortfolioHeader() {
                     : "transition-none"
                 }
 
-                group-hover:text-[#ddd6fe]
+                group-hover:text-gray-600
               `}
             >
               Miguel Alexis Sánchez Carranza
@@ -314,22 +316,14 @@ export default function PortfolioHeader() {
         </a>
       </div>
 
-      {/*
-       * BORDE INFERIOR DEL HEADER
-       *
-       * - No existe ningún borde negro.
-       * - Aparece directamente en morado.
-       * - Está oculto cuando el header está arriba.
-       * - Tiene la misma intensidad en todo el ancho.
-       * - La animación combina opacidad y escala para verse suave.
-       */}
+      {/* Borde inferior del header */}
       <span
         aria-hidden="true"
         className={`
           pointer-events-none absolute inset-x-0 bottom-0
           h-px w-full origin-center
-          bg-[#a78bfa]/70
-          shadow-[0_0_10px_rgba(167,139,250,0.18)]
+          bg-gray-300/80
+          shadow-[0_0_10px_rgba(0,0,0,0.05)]
           [backface-visibility:hidden]
 
           ${

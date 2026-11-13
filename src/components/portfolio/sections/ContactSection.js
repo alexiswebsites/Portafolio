@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
-import LaptopMockup from "@/components/LaptopMockup";
 
 const whatsappMessage =
   "Hola, me interesa solicitar información sobre la creación de un sitio web.";
@@ -15,6 +14,11 @@ const phoneUrl = "tel:+523312891927";
 
 const emailUrl =
   "mailto:alexissanchezdev7@gmail.com?subject=Cotización%20de%20página%20web";
+
+/* =========================================================
+   DIVISOR DE SECCIÓN
+   MODIFICA AQUÍ EL COLOR Y TAMAÑO DEL DIVISOR
+========================================================= */
 
 function BiNeBianniDivider({ position }) {
   const posicion =
@@ -32,37 +36,44 @@ function BiNeBianniDivider({ position }) {
         ${posicion}
       `}
     >
+      {/* Línea izquierda */}
       <span
         className="
           h-px flex-1
           bg-gradient-to-r
           from-transparent
-          via-[#a78bfa]/80
-          to-[#a78bfa]/40
+          via-[#c7c7cc]/80
+          to-[#c7c7cc]/40
         "
       />
 
+      {/* Rombo central */}
       <span
         className="
           h-2.5 w-2.5 shrink-0 rotate-45
           rounded-[2px]
-          bg-[#a78bfa]
-          shadow-[0_0_18px_rgba(167,139,250,0.75)]
+          bg-[#c7c7cc]
+          shadow-[0_0_12px_rgba(0,0,0,0.08)]
         "
       />
 
+      {/* Línea derecha */}
       <span
         className="
           h-px flex-1
           bg-gradient-to-l
           from-transparent
-          via-[#a78bfa]/80
-          to-[#a78bfa]/40
+          via-[#c7c7cc]/80
+          to-[#c7c7cc]/40
         "
       />
     </div>
   );
 }
+
+/* =========================================================
+   CONTACT SECTION
+========================================================= */
 
 export default function ContactSection() {
   const sectionRef = useRef(null);
@@ -88,6 +99,7 @@ export default function ContactSection() {
       Después de entrar en pantalla deja de observarse,
       evitando que desaparezca al subir o bajar.
     */
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
@@ -115,21 +127,17 @@ export default function ContactSection() {
       className="
         relative scroll-mt-[90px]
         overflow-visible
-        bg-[#0b0511]
+        bg-[#f5f5f7]
+        text-[#1d1d1f]
         px-5 py-14
         text-center
         md:px-6 md:py-[4.5rem]
       "
     >
-      {/* Separador siempre visible, sin animación ni flashes */}
+      {/* Separador superior */}
       <BiNeBianniDivider position="top" />
 
-      {/*
-        Fondo estático optimizado.
-
-        Reemplaza el círculo con blur-[130px] por gradientes radiales.
-        Conserva el resplandor morado sin forzar blur durante el scroll.
-      */}
+      {/* Fondo estático optimizado */}
       <div
         aria-hidden="true"
         className="
@@ -141,19 +149,20 @@ export default function ContactSection() {
         <div
           className="
             absolute inset-0
-            bg-[radial-gradient(circle_at_50%_45%,rgba(124,58,237,0.16),transparent_38%),radial-gradient(circle_at_15%_100%,rgba(147,51,234,0.055),transparent_32%),radial-gradient(circle_at_90%_0%,rgba(139,92,246,0.06),transparent_30%)]
+            bg-[radial-gradient(circle_at_50%_45%,rgba(255,255,255,0.92),transparent_38%),radial-gradient(circle_at_15%_100%,rgba(0,0,0,0.025),transparent_32%),radial-gradient(circle_at_90%_0%,rgba(255,255,255,0.75),transparent_30%)]
           "
         />
       </div>
 
       <div className="relative mx-auto max-w-3xl">
+
         {/* Texto pequeño */}
         <p
           className={`
             transform-gpu
             text-xs uppercase
             tracking-[0.18em]
-            text-[#c4b5fd]/55
+            text-[#86868b]
             transition-[opacity,transform]
             duration-700
             ease-[cubic-bezier(0.16,1,0.3,1)]
@@ -172,11 +181,12 @@ export default function ContactSection() {
           Contacto
         </p>
 
-        {/* Título */}
+        {/* TÍTULO: COLOR NEGRO APPLE */}
         <h2
           className={`
             mt-3 transform-gpu
             text-3xl font-semibold leading-tight
+            !text-[#1d1d1f]
             transition-[opacity,transform]
             delay-[90ms]
             duration-[900ms]
@@ -202,7 +212,7 @@ export default function ContactSection() {
             mx-auto mt-5 max-w-2xl
             transform-gpu
             text-sm leading-relaxed
-            text-white/65
+            !text-[#6e6e73]
             transition-[opacity,transform]
             delay-[210ms]
             duration-[800ms]
@@ -225,8 +235,9 @@ export default function ContactSection() {
           necesites.
         </p>
 
-        {/* Botones */}
+        {/* BOTONES */}
         <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+
           {/* WhatsApp */}
           <div
             className={`
@@ -257,18 +268,17 @@ export default function ContactSection() {
                 bg-[#22c55e]
                 px-7 py-3
                 text-center font-semibold text-white
-                shadow-[0_12px_35px_rgba(34,197,94,0.22)]
+                shadow-[0_8px_24px_rgba(34,197,94,0.16)]
                 transition-[transform,background-color,box-shadow]
                 duration-300
                 hover:-translate-y-0.5
                 hover:bg-[#16a34a]
-                hover:shadow-[0_16px_38px_rgba(34,197,94,0.27)]
+                hover:shadow-[0_10px_28px_rgba(34,197,94,0.20)]
                 active:scale-[0.97]
                 md:px-8 md:py-4
               "
             >
               <FaWhatsapp className="text-xl" />
-
               <span>Contactar por WhatsApp</span>
             </a>
           </div>
@@ -297,15 +307,15 @@ export default function ContactSection() {
               className="
                 block w-full cursor-pointer
                 rounded-full
-                border border-[#c4b5fd]/15
-                bg-[#8b5cf6]/10
+                border border-[#d2d2d7]
+                bg-white/75
                 px-7 py-3
-                text-center font-medium text-white
+                text-center font-medium text-[#1d1d1f]
                 transition-[transform,border-color,background-color]
                 duration-300
                 hover:-translate-y-0.5
-                hover:border-[#c4b5fd]/30
-                hover:bg-[#8b5cf6]/20
+                hover:border-[#a1a1a6]
+                hover:bg-white
                 active:scale-[0.97]
                 md:px-8 md:py-4
               "
@@ -338,15 +348,15 @@ export default function ContactSection() {
               className="
                 block w-full cursor-pointer
                 rounded-full
-                border border-[#c4b5fd]/15
-                bg-[#8b5cf6]/10
+                border border-[#d2d2d7]
+                bg-white/75
                 px-7 py-3
-                text-center font-medium text-white
+                text-center font-medium text-[#1d1d1f]
                 transition-[transform,border-color,background-color]
                 duration-300
                 hover:-translate-y-0.5
-                hover:border-[#c4b5fd]/30
-                hover:bg-[#8b5cf6]/20
+                hover:border-[#a1a1a6]
+                hover:bg-white
                 active:scale-[0.97]
                 md:px-8 md:py-4
               "
@@ -354,10 +364,11 @@ export default function ContactSection() {
               Correo
             </a>
           </div>
+
         </div>
       </div>
 
-      {/* Separador siempre visible, independiente del observer */}
+      {/* Separador inferior */}
       <BiNeBianniDivider position="bottom" />
     </section>
   );

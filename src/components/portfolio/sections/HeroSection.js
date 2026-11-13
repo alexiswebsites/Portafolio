@@ -1,11 +1,11 @@
+
 "use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import HeroMockup from "./HeroMockup";
 
-const whatsappMessage =
-  "";
+const whatsappMessage = "";
 
 const whatsappUrl = `https://wa.me/5213312891927?text=${encodeURIComponent(
   whatsappMessage,
@@ -22,12 +22,7 @@ export default function HeroSection() {
 
     if (!hero) return;
 
-    /*
-     * Guarda la altura visible inicial del navegador.
-     *
-     * El hero no aumenta cuando desaparecen las barras de Safari
-     * o Chrome móvil.
-     */
+    // Conserva la altura visible inicial del navegador.
     const alturaInicial = Math.round(
       window.visualViewport?.height ?? window.innerHeight,
     );
@@ -38,21 +33,11 @@ export default function HeroSection() {
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    /*
-     * Si la página se refresca estando más abajo, mostramos el hero
-     * directamente para evitar una animación fuera de pantalla.
-     */
     if (reducirMovimiento || window.scrollY > 40) {
       setEntradaLista(true);
       return;
     }
 
-    /*
-     * Esperamos un solo frame.
-
-     * Así el navegador registra primero el estado inicial y después
-     * realiza una transición limpia, sin mostrar y ocultar elementos.
-     */
     animationFrameRef.current = window.requestAnimationFrame(() => {
       setEntradaLista(true);
     });
@@ -73,37 +58,49 @@ export default function HeroSection() {
       className="
         relative isolate
         box-border overflow-hidden
+        bg-[#f5f5f7]
         pt-[74px]
         sm:pt-[70px]
       "
     >
-      {/* Fondo principal completamente estático */}
+      {/* Fondo base Apple White */}
       <div
         aria-hidden="true"
         className="
           pointer-events-none
           absolute inset-0 -z-30
-          bg-[radial-gradient(circle_at_20%_15%,rgba(124,58,237,0.25),transparent_35%),radial-gradient(circle_at_85%_65%,rgba(168,85,247,0.18),transparent_35%),linear-gradient(145deg,#07040b_0%,#160a23_48%,#09060f_100%)]
+          bg-[#f5f5f7]
         "
       />
 
-      {/* Resplandores estáticos sin blur pesado */}
+      {/* Iluminación radial blanca: igual al About */}
       <div
         aria-hidden="true"
         className="
           pointer-events-none
           absolute inset-0 -z-20
-          bg-[radial-gradient(ellipse_at_top_left,rgba(124,58,237,0.13),transparent_46%),radial-gradient(ellipse_at_bottom_right,rgba(217,70,239,0.09),transparent_44%)]
+          bg-[
+            radial-gradient(
+              ellipse_at_15%_10%,
+              rgba(255,255,255,0.95),
+              transparent_48%
+            ),
+            radial-gradient(
+              ellipse_at_85%_80%,
+              rgba(255,255,255,0.85),
+              transparent_46%
+            )
+          ]
         "
       />
 
-      {/* Oscurecimiento ligero de los bordes */}
+      {/* Degradado ambiental */}
       <div
         aria-hidden="true"
         className="
           pointer-events-none
           absolute inset-0 -z-10
-          bg-[linear-gradient(180deg,rgba(0,0,0,0.02),transparent_25%,transparent_70%,rgba(0,0,0,0.12))]
+          bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0)_50%,rgba(0,0,0,0.012))]
         "
       />
 
@@ -125,7 +122,7 @@ export default function HeroSection() {
           lg:gap-12 lg:pb-10 lg:pt-10
         "
       >
-        {/* Texto: una sola animación coordinada */}
+        {/* Texto */}
         <div
           className={`
             relative z-20 order-2
@@ -146,29 +143,69 @@ export default function HeroSection() {
             }
           `}
         >
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#b99cff] sm:mb-3 sm:text-xs">
+          {/* Etiqueta */}
+          <p
+            className="
+              mb-2
+              text-[11px] font-semibold
+              uppercase tracking-[0.22em]
+              text-[#86868b]
+              sm:mb-3 sm:text-xs
+            "
+          >
             Desarrollo y diseño web
           </p>
 
-          <h1 className="text-[clamp(1.9rem,8vw,4.7rem)] font-semibold leading-[0.96] tracking-[-0.05em]">
+          {/* Título */}
+          <h1
+            className="
+              text-[clamp(1.9rem,8vw,4.7rem)]
+              font-semibold
+              leading-[0.96]
+              tracking-[-0.05em]
+              text-[#1d1d1f]
+            "
+          >
             Creador de sitios web
 
-            <span className="mt-1 block text-white/70">
+            <span
+              className="
+                mt-1 block
+                text-[#86868b]
+              "
+            >
               para tu negocio.
             </span>
           </h1>
 
-          <div className="mt-3 text-[13px] leading-relaxed text-white/60 sm:mt-5 sm:text-base md:mt-6">
+          {/* Descripción */}
+          <div
+            className="
+              mt-3
+              text-[13px]
+              leading-relaxed
+              text-[#6e6e73]
+              sm:mt-5 sm:text-base
+              md:mt-6
+            "
+          >
             <p>
               Recibe una vista previa de tu página en menos de 24 horas.
             </p>
 
-            <p className="font-medium text-white/90">
+            <p className="font-semibold text-[#424245]">
               Solo pagas si decides continuar.
             </p>
           </div>
 
-          <div className="mt-4 flex w-full flex-col gap-2 sm:mt-6 sm:gap-2.5">
+          {/* Botones */}
+          <div
+            className="
+              mt-4 flex w-full flex-col
+              gap-2 sm:mt-6 sm:gap-2.5
+            "
+          >
+            {/* WhatsApp */}
             <a
               href={whatsappUrl}
               target="_blank"
@@ -181,21 +218,21 @@ export default function HeroSection() {
                 bg-[#22c55e]
                 px-7
                 text-sm font-semibold text-white
-                shadow-[0_14px_34px_rgba(34,197,94,0.2)]
+                shadow-[0_8px_24px_rgba(34,197,94,0.16)]
                 transition-[transform,background-color,box-shadow]
                 duration-300
                 hover:-translate-y-0.5
                 hover:bg-[#16a34a]
-                hover:shadow-[0_17px_38px_rgba(34,197,94,0.24)]
+                hover:shadow-[0_12px_28px_rgba(34,197,94,0.22)]
                 active:scale-[0.97]
                 sm:min-h-12
               "
             >
               <FaWhatsapp className="text-xl" />
-
               Contactar por WhatsApp
             </a>
 
+            {/* Proyectos - Crystal Glass */}
             <a
               href="#projects"
               className="
@@ -203,15 +240,18 @@ export default function HeroSection() {
                 cursor-pointer
                 items-center justify-center
                 rounded-full
-                bg-[#7c3aed]
+                border border-white/80
+                bg-white/65
                 px-7
-                text-sm font-semibold text-white
-                shadow-[0_14px_34px_rgba(124,58,237,0.25)]
-                transition-[transform,background-color,box-shadow]
+                text-sm font-semibold text-[#1d1d1f]
+                shadow-[0_8px_25px_rgba(0,0,0,0.045)]
+                backdrop-blur-xl
+                transition-[transform,background-color,border-color,box-shadow]
                 duration-300
                 hover:-translate-y-0.5
-                hover:bg-[#8b5cf6]
-                hover:shadow-[0_17px_38px_rgba(124,58,237,0.3)]
+                hover:border-white
+                hover:bg-white/90
+                hover:shadow-[0_10px_30px_rgba(0,0,0,0.075)]
                 active:scale-[0.97]
                 sm:min-h-12
               "
@@ -221,7 +261,7 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Mockup: entrada suave e independiente */}
+        {/* Mockup original: sin modificar */}
         <div
           className={`
             relative z-10 order-1
