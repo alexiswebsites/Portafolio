@@ -1,417 +1,303 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-function BiNeBianniDivider({ position }) {
-  const posicion =
-    position === "top"
-      ? "top-0 -translate-y-1/2"
-      : "bottom-0 translate-y-1/2";
+const projects = [
+  {
+    title: "Modo de Viaje",
+    subtitle: "Sitio web de viajes · México",
+    category: "Agencia de viajes",
+    description:
+      "Sitio web para una agencia de viajes con experiencias curadas, viajes a medida y en grupo, presentación de servicios y contacto directo por WhatsApp.",
+    domain: "mododeviaje.com",
+    image: "/images/proyectos/heromdv.png",
+    href: "https://mododeviaje.com/",
+    cta: "Visitar sitio",
+  },
+  {
+    title: "Bi Ne Bianni",
+    subtitle: "Mediación entre empresas y comunidades",
+    category: "Consultoría social",
+    description:
+      "Sitio web para una consultoría social que vincula empresas con comunidades, con secciones informativas, presentación de servicios y diseño moderno.",
+    domain: "bnbconsultoria.com",
+    image: "/images/proyectos/herobinebiani.png",
+    href: "https://bnbconsultoria.com/",
+    cta: "Visitar sitio",
+  },
+  {
+    title: "QuickCart",
+    subtitle: "Tienda demo con carrito de compras",
+    category: "Tienda de electrónica",
+    description:
+      "Tienda online de demostración con catálogo de productos electrónicos por categorías, carrito de compras y flujo de pedido simulado.",
+    domain: "alexissanchez.vercel.app/quickcart",
+    image: "/images/proyectos/heroquickcart.png",
+    href: "/quickcart",
+    cta: "Visitar sitio",
+  },
+  {
+    title: "Hamburguesas Fátima",
+    subtitle: "Menú digital para entregas a domicilio",
+    category: "Puesto de comida",
+    description:
+      "Página web para un puesto de comida, enfocada en mostrar un menú digital con carrito, recibir pedidos a domicilio por WhatsApp y facilitar la atención directa con clientes.",
+    domain: "hamburguesas-fatima.vercel.app",
+    image: "/images/proyectos/herofatima.png",
+    href: "https://hamburguesas-fatima.vercel.app/",
+    cta: "Visitar sitio",
+  },
+  // Quinto proyecto: descoméntalo cuando lo tengas listo
+  // {
+  //   title: "Foto Estudio Sánchez",
+  //   subtitle: "Estudio de fotografía · México",
+  //   category: "Fotografía",
+  //   description:
+  //     "Sitio web para un estudio de fotografía con galería de trabajos, paquetes de sesiones y contacto para agendar citas.",
+  //   domain: "fotoestudiosanchez.com",
+  //   image: "/images/proyectos/herofotoestudio.png",
+  //   href: "https://fotoestudiosanchez.com/",
+  //   cta: "Visitar sitio",
+  // },
+];
+
+/*
+  Layout automático según cuántos proyectos haya.
+  Escritorio (6 columnas): filas de 3 cards; si sobran, las primeras filas
+  llevan 2 cards más grandes → nunca queda una card sola.
+    4 → 2+2 · 5 → 2+3 · 6 → 3+3 · 7 → 2+2+3 · 8 → 2+3+3
+  Tablet (4 columnas): filas de 2; si es impar, la última se centra.
+  Celular: 1 columna.
+*/
+function getLayout(total) {
+  if (total === 1) {
+    return [
+      {
+        featured: false,
+        className: "sm:col-span-2 sm:col-start-2 lg:col-span-2 lg:col-start-3",
+      },
+    ];
+  }
+
+  const remainder = total % 3;
+  const featuredCount = remainder === 0 ? 0 : remainder === 2 ? 2 : 4;
+
+  return Array.from({ length: total }, (_, i) => {
+    const featured = i < featuredCount;
+    const isOddLast = total % 2 === 1 && i === total - 1;
+
+    return {
+      featured,
+      className: [
+        "sm:col-span-2",
+        featured ? "lg:col-span-3" : "lg:col-span-2",
+        isOddLast ? "sm:col-start-2 lg:col-start-auto" : "",
+      ].join(" "),
+    };
+  });
+}
+
+function ArrowIcon({ external }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {external ? (
+        <path d="M7 17 17 7M8 7h9v9" />
+      ) : (
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      )}
+    </svg>
+  );
+}
+
+function ProjectCard({ project, featured }) {
+  const { title, subtitle, category, description, domain, image, href, cta } =
+    project;
+  const isInternal = href.startsWith("/");
+
+  const cardClass = `
+    group relative flex h-full flex-col rounded-[24px] bg-[#f5f5f7]
+    ring-1 ring-black/[0.06]
+    shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)]
+    transition-transform duration-500 ease-apple
+    motion-safe:hover:-translate-y-1
+    before:pointer-events-none before:absolute before:inset-0 before:rounded-[24px]
+    before:shadow-[0_28px_56px_-24px_rgba(0,0,0,0.25)]
+    before:opacity-0 before:transition-opacity before:duration-500
+    hover:before:opacity-100
+    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0066cc]
+    focus-visible:ring-offset-4 focus-visible:ring-offset-white
+  `;
+
+  const content = (
+    <>
+      {/* Ventana tipo navegador */}
+      <div className="relative overflow-hidden rounded-t-[24px] border-b border-black/[0.06]">
+        <div className="flex h-10 items-center gap-3 border-b border-black/[0.06] bg-[#f5f5f7] px-4">
+          <div className="flex shrink-0 gap-1.5" aria-hidden="true">
+            <span className="h-3 w-3 rounded-full bg-[#ff5f57] ring-1 ring-inset ring-black/[0.12]" />
+            <span className="h-3 w-3 rounded-full bg-[#febc2e] ring-1 ring-inset ring-black/[0.12]" />
+            <span className="h-3 w-3 rounded-full bg-[#28c840] ring-1 ring-inset ring-black/[0.12]" />
+          </div>
+
+          <div
+            aria-hidden="true"
+            className="
+              mx-auto flex h-6 min-w-0 max-w-[75%] items-center gap-1.5 rounded-md
+              bg-white px-3 ring-1 ring-black/[0.06]
+              shadow-[0_1px_2px_rgba(0,0,0,0.06)]
+            "
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="h-3 w-3 shrink-0 text-[#515154]"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+            <span className="truncate text-xs font-medium text-[#424245]">
+              {domain}
+            </span>
+          </div>
+
+          <div className="w-[48px] shrink-0" aria-hidden="true" />
+        </div>
+
+        <div className="relative aspect-video overflow-hidden bg-[#f5f5f7]">
+          <Image
+            src={image}
+            alt={`Vista previa del sitio web de ${title}`}
+            fill
+            sizes={
+              featured
+                ? "(min-width: 1024px) 500px, (min-width: 640px) 50vw, 100vw"
+                : "(min-width: 1024px) 330px, (min-width: 640px) 50vw, 100vw"
+            }
+            className="
+              object-cover object-top
+              transition-transform duration-700 ease-apple
+              motion-safe:group-hover:scale-[1.03]
+            "
+          />
+        </div>
+      </div>
+
+      {/* Información */}
+      <div className="flex flex-1 flex-col rounded-b-[24px] bg-[#f5f5f7] px-6 pb-6 pt-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#0055b3]">
+          {category}
+        </p>
+
+        <h3
+          className={`mt-2 font-semibold leading-snug tracking-tight text-[#1d1d1f] ${
+            featured ? "text-xl sm:text-2xl" : "text-lg sm:text-xl"
+          }`}
+        >
+          {title}
+        </h3>
+
+        <p className="mt-1 text-sm font-medium text-[#424245]">{subtitle}</p>
+
+        <p className="mt-3 text-[15px] leading-relaxed text-[#515154]">
+          {description}
+        </p>
+
+        {/* mt-auto empuja el CTA al fondo para que todas las cards queden parejas */}
+        <div className="mt-auto flex items-center justify-between gap-4 pt-6">
+          <span className="text-sm font-semibold text-[#0055b3] transition-colors duration-300 group-hover:text-[#003d82]">
+            {cta}
+          </span>
+
+          <span
+            aria-hidden="true"
+            className="
+              flex h-9 w-9 shrink-0 items-center justify-center rounded-full
+              bg-white text-[#1d1d1f]
+              shadow-[0_1px_2px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.04]
+              transition-colors duration-300
+              group-hover:bg-[#0066cc] group-hover:text-white
+              group-focus-visible:bg-[#0066cc] group-focus-visible:text-white
+            "
+          >
+            <ArrowIcon external={!isInternal} />
+          </span>
+        </div>
+      </div>
+    </>
+  );
+
+  if (isInternal) {
+    return (
+      <Link href={href} className={cardClass}>
+        {content}
+      </Link>
+    );
+  }
 
   return (
-    <div
-      aria-hidden="true"
-      className={`
-        pointer-events-none absolute left-0 z-20
-        flex w-full items-center justify-center gap-0
-        ${posicion}
-      `}
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cardClass}
     >
-      <span className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-black/10" />
-
-      <span
-        className="
-          h-2.5 w-2.5 shrink-0 rotate-45
-          rounded-[2px]
-          border border-black/10
-          bg-white/90
-          shadow-[0_1px_5px_rgba(0,0,0,0.12)]
-        "
-      />
-
-      <span className="h-px flex-1 bg-gradient-to-l from-transparent via-black/15 to-black/10" />
-    </div>
+      {content}
+      <span className="sr-only"> (se abre en una pestaña nueva)</span>
+    </a>
   );
 }
 
 export default function ProjectsSection() {
-  const sectionRef = useRef(null);
-  const cardRefs = useRef([]);
-
-  const [sectionVisible, setSectionVisible] = useState(false);
-  const [visibleCards, setVisibleCards] = useState(() => new Set());
-
-  useEffect(() => {
-    const section = sectionRef.current;
-
-    if (!section) return;
-
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    if (reduceMotion || !("IntersectionObserver" in window)) {
-      setSectionVisible(true);
-      setVisibleCards(new Set([0, 1, 2, 3]));
-      return;
-    }
-
-    const sectionObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-
-        setSectionVisible(true);
-        sectionObserver.unobserve(entry.target);
-      },
-      {
-        threshold: 0.06,
-        rootMargin: "0px 0px -8% 0px",
-      },
-    );
-
-    const cardsObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-
-          const index = Number(entry.target.dataset.cardIndex);
-
-          setVisibleCards((previousCards) => {
-            if (previousCards.has(index)) return previousCards;
-
-            const nextCards = new Set(previousCards);
-            nextCards.add(index);
-
-            return nextCards;
-          });
-
-          cardsObserver.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.16,
-        rootMargin: "0px 0px -5% 0px",
-      },
-    );
-
-    sectionObserver.observe(section);
-
-    cardRefs.current.forEach((card) => {
-      if (card) cardsObserver.observe(card);
-    });
-
-    return () => {
-      sectionObserver.disconnect();
-      cardsObserver.disconnect();
-    };
-  }, []);
-
-  const cardAnimationClass = (index) => {
-    const cardVisible = visibleCards.has(index);
-
-    const initialPosition = [
-      "-translate-x-6 rotate-[-1.5deg]",
-      "translate-x-6 rotate-[1.5deg]",
-      "-translate-x-6 rotate-[-1.5deg]",
-      "translate-x-6 rotate-[1.5deg]",
-    ];
-
-    return `
-      h-full min-w-0 transform-gpu
-      transition-[opacity,transform]
-      duration-[800ms]
-      ease-[cubic-bezier(0.16,1,0.3,1)]
-      [backface-visibility:hidden]
-      motion-reduce:transform-none
-      motion-reduce:opacity-100
-      motion-reduce:transition-none
-      ${
-        cardVisible
-          ? "translate-x-0 translate-y-0 scale-100 rotate-0 opacity-100"
-          : `${initialPosition[index]} translate-y-10 scale-[0.93] opacity-0`
-      }
-    `;
-  };
-
-  const cardStyle = `
-    group block h-full w-full
-    cursor-pointer
-    rounded-2xl
-    border border-white/80
-    bg-white/65 backdrop-blur-xl
-    p-5
-    shadow-[0_8px_30px_rgba(0,0,0,0.045)]
-    transition-[transform,border-color,background-color,box-shadow]
-    duration-300
-    active:scale-[0.985]
-    sm:hover:-translate-y-1
-    sm:hover:border-black/10
-    sm:hover:bg-white/90
-    md:p-7
-  `;
-
-  const categoryStyle = `
-    shrink-0 rounded-full
-    border border-black/10
-    bg-white/70
-    px-3 py-1
-    text-xs text-[#6e6e73]
-  `;
-
-  const titleStyle = "text-lg font-medium text-[#1d1d1f]";
-
-  const descriptionStyle =
-    "mt-3 text-sm leading-relaxed text-[#424245] md:text-base";
-
-  const linkStyle = `
-    mt-5 inline-block
-    text-sm font-medium text-[#1d1d1f]
-    transition-[color,transform]
-    duration-300
-    group-hover:translate-x-1
-    group-hover:text-black
-  `;
+  const layout = getLayout(projects.length);
 
   return (
     <section
-      ref={sectionRef}
       id="projects"
-      className="
-        relative scroll-mt-[90px]
-        overflow-visible
-        bg-[#f5f5f7] text-[#1d1d1f]
-        px-5 py-12
-        md:px-6 md:py-16
-      "
+      aria-labelledby="projects-heading"
+      className="bg-white px-5 py-16 text-[#1d1d1f] sm:px-6 md:py-24 lg:px-8"
     >
-      <BiNeBianniDivider position="top" />
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-      >
-        <div
-          className="
-            absolute inset-0
-            bg-[radial-gradient(circle_at_100%_18%,rgba(0,0,0,0.045),transparent_34%),radial-gradient(circle_at_0%_88%,rgba(0,0,0,0.025),transparent_30%)]
-          "
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-6xl">
-        {/* ENCABEZADO */}
+      <header className="mx-auto mb-10 max-w-5xl md:mb-14">
         <div className="max-w-2xl">
-          <p
-            className={`
-              transform-gpu text-xs uppercase tracking-[0.18em]
-              text-[#86868b]
-              transition-[opacity,transform] duration-700
-              ease-[cubic-bezier(0.16,1,0.3,1)]
-              md:text-sm
-              ${
-                sectionVisible
-                  ? "translate-x-0 opacity-100"
-                  : "-translate-x-10 opacity-0"
-              }
-            `}
-          >
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6e6e73]">
             Portafolio
           </p>
 
           <h2
-            className={`
-              mt-3 origin-left transform-gpu
-              text-2xl font-semibold
-              transition-[opacity,transform] delay-[90ms]
-              duration-[850ms]
-              ease-[cubic-bezier(0.16,1,0.3,1)]
-              md:text-4xl
-              ${
-                sectionVisible
-                  ? "translate-y-0 scale-100 opacity-100"
-                  : "translate-y-9 scale-[0.94] opacity-0"
-              }
-            `}
+            id="projects-heading"
+            className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl"
           >
             Proyectos propios
           </h2>
 
-          <p
-            className={`
-              mt-4 transform-gpu text-sm leading-relaxed
-              text-[#424245]
-              transition-[opacity,transform] delay-[190ms]
-              duration-[750ms]
-              ease-[cubic-bezier(0.16,1,0.3,1)]
-              md:text-base
-              ${
-                sectionVisible
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-7 opacity-0"
-              }
-            `}
-          >
+          <p className="mt-4 text-base leading-relaxed text-[#424245] md:text-lg">
             Una selección de proyectos creados para mostrar mi forma de
             trabajar.
           </p>
         </div>
+      </header>
 
-        {/* PROYECTOS */}
-        <div className="mt-7 grid gap-4 md:mt-8 md:grid-cols-2 md:gap-6">
-          {/* 1. MODO DE VIAJE */}
-          <div
-            ref={(element) => {
-              cardRefs.current[0] = element;
-            }}
-            data-card-index="0"
-            className={cardAnimationClass(0)}
-            style={{
-              transitionDelay: visibleCards.has(0) ? "0ms" : "0ms",
-            }}
-          >
-            <a
-              href="https://mododeviaje.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Visitar Modo de Viaje"
-              className={cardStyle}
-            >
-              <div className="flex items-center justify-between gap-4">
-                <h3 className={titleStyle}>Modo de Viaje</h3>
-
-                <span className={categoryStyle}>
-                  Sitio web
-                </span>
-              </div>
-
-              <p className={descriptionStyle}>
-                Descripción provisional del proyecto. Aquí podrás agregar
-                información sobre el sitio web, sus funcionalidades y el
-                trabajo realizado.
-              </p>
-
-              <span className={linkStyle}>
-                Visitar sitio →
-              </span>
-            </a>
-          </div>
-
-          {/* 2. HAMBURGUESAS FÁTIMA */}
-          <div
-            ref={(element) => {
-              cardRefs.current[1] = element;
-            }}
-            data-card-index="1"
-            className={cardAnimationClass(1)}
-            style={{
-              transitionDelay: visibleCards.has(1) ? "80ms" : "0ms",
-            }}
-          >
-            <a
-              href="https://hamburguesas-fatima.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Visitar Hamburguesas Fátima"
-              className={cardStyle}
-            >
-              <div className="flex items-center justify-between gap-4">
-                <h3 className={titleStyle}>
-                  Hamburguesas Fátima
-                </h3>
-
-                <span className={categoryStyle}>
-                  Restaurante
-                </span>
-              </div>
-
-              <p className={descriptionStyle}>
-                Página web para negocio de comida, enfocada en mostrar un
-                menú digital con carrito, recibir pedidos a domicilio por
-                WhatsApp y facilitar la atención directa con clientes.
-              </p>
-
-              <span className={linkStyle}>
-                Visitar sitio →
-              </span>
-            </a>
-          </div>
-
-          {/* 3. BI NE BIANNI */}
-          <div
-            ref={(element) => {
-              cardRefs.current[2] = element;
-            }}
-            data-card-index="2"
-            className={cardAnimationClass(2)}
-            style={{
-              transitionDelay: visibleCards.has(2) ? "80ms" : "0ms",
-            }}
-          >
-            <a
-              href="https://binebianni.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Visitar Bi Ne Bianni"
-              className={cardStyle}
-            >
-              <div className="flex items-center justify-between gap-4">
-                <h3 className={titleStyle}>Bi Ne Bianni</h3>
-
-                <span className={categoryStyle}>
-                  Sitio empresarial
-                </span>
-              </div>
-
-              <p className={descriptionStyle}>
-                Sitio web para una consultoría social, con secciones
-                informativas, presentación de servicios y diseño moderno.
-              </p>
-
-              <span className={linkStyle}>
-                Visitar sitio →
-              </span>
-            </a>
-          </div>
-
-          {/* 4. QUICKCART */}
-          <div
-            ref={(element) => {
-              cardRefs.current[3] = element;
-            }}
-            data-card-index="3"
-            className={cardAnimationClass(3)}
-            style={{
-              transitionDelay: visibleCards.has(3) ? "80ms" : "0ms",
-            }}
-          >
-            <Link
-              href="/quickcart"
-              aria-label="Visitar QuickCart"
-              className={cardStyle}
-            >
-              <div className="flex items-center justify-between gap-4">
-                <h3 className={titleStyle}>QuickCart</h3>
-
-                <span className={categoryStyle}>
-                  Tienda online
-                </span>
-              </div>
-
-              <p className={descriptionStyle}>
-                Tienda online de demostración con catálogo de productos,
-                carrito de compras y flujo de pedido simulado.
-              </p>
-
-              <span className={linkStyle}>
-                Ver proyecto →
-              </span>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <BiNeBianniDivider position="bottom" />
+      <ul className="mx-auto grid max-w-5xl grid-cols-1 gap-5 sm:grid-cols-4 lg:grid-cols-6 lg:gap-6">
+        {projects.map((project, index) => (
+          <li key={project.title} className={layout[index].className}>
+            <ProjectCard
+              project={project}
+              featured={layout[index].featured}
+            />
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

@@ -1,21 +1,37 @@
 @import "tailwindcss";
 
-/* Colores base */
-:root {
-  --background: #09060f;
-  --foreground: #000000;
+/* ================================= */
+/* TEMA (genera clases de Tailwind)  */
+/* ================================= */
+
+@theme inline {
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease-apple: cubic-bezier(0.16, 1, 0.3, 1); /* clase: ease-apple */
 }
 
-/* Scroll y tamaño general */
+/* ================================= */
+/* COLORES BASE                      */
+/* ================================= */
+
+:root {
+  --background: #ffffff;
+  --foreground: #1d1d1f;
+}
+
+/* ================================= */
+/* BASE                              */
+/* (box-sizing e img/svg ya vienen   */
+/* en el preflight de Tailwind)      */
+/* ================================= */
+
 html {
   min-height: 100%;
   overflow-x: clip;
-  scroll-behavior: smooth;
   scroll-padding-top: 90px;
   background: var(--background);
+  color-scheme: light;
 }
 
-/* Estilos generales */
 body {
   margin: 0;
   min-height: 100vh;
@@ -23,107 +39,142 @@ body {
   overflow-x: clip;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Evita que los tamaños y bordes causen desbordamientos */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
-/* Evita que imágenes y elementos gráficos se salgan */
-img,
-svg {
-  display: block;
-  max-width: 100%;
+/* ================================= */
+/* ANIMACIÓN DE ENTRADA AL CARGAR    */
+/* Solo Hero y navbar                */
+/* Uso: className="fade"             */
+/* Retraso: className="fade [--delay:150ms]" */
+/* ================================= */
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
 }
 
-/* ============================== */
-/* ANIMACIONES DEL MOCKUP DEL HERO */
-/* ============================== */
+.fade {
+  animation: fade 700ms var(--ease-apple) var(--delay, 0ms) both;
+}
 
-/* Laptop y celular flotando suavemente */
+/* ================================= */
+/* REVEAL AUTOMÁTICO CON SCROLL      */
+/* Se aplica solo a TODA la web      */
+/* (excepto el Hero, que usa .fade)  */
+/* ================================= */
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    main > section:not(:first-child) > *,
+    footer > * {
+      animation: reveal ease-out both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
+/* ================================= */
+/* ANIMACIONES DEL MOCKUP DEL HERO   */
+/* ================================= */
+
 @keyframes mockup-float {
   0%,
   100% {
     transform: translate3d(0, 0, 0);
   }
-
   50% {
     transform: translate3d(0, -10px, 0);
   }
 }
 
-/* Scroll dentro de la laptop */
 @keyframes desktop-screen-scroll {
   0%,
   12% {
     transform: translate3d(0, 0, 0);
   }
-
   42%,
   52% {
     transform: translate3d(0, -28%, 0);
   }
-
   88%,
   100% {
     transform: translate3d(0, -58%, 0);
   }
 }
 
-/* Scroll dentro del celular */
 @keyframes mobile-screen-scroll {
   0%,
   12% {
     transform: translate3d(0, 0, 0);
   }
-
   42%,
   52% {
     transform: translate3d(0, -30%, 0);
   }
-
   88%,
   100% {
     transform: translate3d(0, -61%, 0);
   }
 }
 
-/* Movimiento del mockup completo */
 .mockup-float {
   animation: mockup-float 5s ease-in-out infinite;
 }
 
-/* Movimiento de la página en la laptop */
 .desktop-screen-scroll {
   animation: desktop-screen-scroll 14s ease-in-out infinite alternate;
 }
 
-/* Movimiento de la página en el celular */
 .mobile-screen-scroll {
   animation: mobile-screen-scroll 12s ease-in-out infinite alternate;
 }
 
-/* Mockup más grande en móvil */
-@media (max-width: 639px) {
-  .mockup-float {
-    width: 100%;
-  }
+/* Pausa manual (WCAG 2.2.2): el botón pone data-motion="paused" en el contenedor */
+[data-motion="paused"] :is(.mockup-float, .desktop-screen-scroll, .mobile-screen-scroll) {
+  animation-play-state: paused;
 }
 
-/* Accesibilidad: desactiva animaciones si el usuario lo solicita */
+/* ================================= */
+/* ACCESIBILIDAD: MOVIMIENTO REDUCIDO */
+/* Global: aplica a TODO el sitio    */
+/* ================================= */
+
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
   }
 
+  /* Que el mockup se quede al inicio, no desplazado al final */
   .mockup-float,
   .desktop-screen-scroll,
   .mobile-screen-scroll {
-    animation: none;
-    transform: none;
+    animation: none !important;
   }
 }

@@ -1,7 +1,12 @@
-
 import "./globals.css";
+import { Inter } from "next/font/google";
 
 import AppProvider from "@/components/AppProvider";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 const title = "Portafolio | Miguel Alexis Sánchez Carranza";
 
@@ -46,7 +51,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es" className="min-h-full bg-[#09060f]">
-      <body className="min-h-screen bg-[#09060f]">
+      <body className={`${inter.className} min-h-screen bg-[#09060f]`}>
         <AppProvider>{children}</AppProvider>
       </body>
     </html>

@@ -1,9 +1,5 @@
-import PortfolioReviews from "@/components/PortfolioReviews";
+import PortfolioReviews from "@/components/resenas/PortfolioReviews";
 
 export default function ReviewsSection() {
-  return (
-    <section className=" border-[#c4b5fd]/10 bg-[#0c0612]">
-      <PortfolioReviews />
-    </section>
-  );
+  return <PortfolioReviews />;
 }
