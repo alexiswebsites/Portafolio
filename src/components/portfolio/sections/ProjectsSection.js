@@ -4,7 +4,7 @@ import Image from "next/image";
 const projects = [
   {
     title: "Modo de Viaje",
-    subtitle: "Sitio web de viajes · México",
+    subtitle: "Agencia de viajes de Perú",
     category: "Agencia de viajes",
     description:
       "Sitio web para una agencia de viajes con experiencias curadas, viajes a medida y en grupo, presentación de servicios y contacto directo por WhatsApp.",
@@ -96,86 +96,159 @@ function getLayout(total) {
   });
 }
 
-function ArrowIcon({ external }) {
+/* ---------- Barra del navegador (decorativa) ---------- */
+
+const trafficLights = [
+  {
+    color: "bg-[#ff5f57]",
+    glyph: (
+      <path
+        d="M4.2 4.2l3.6 3.6M7.8 4.2 4.2 7.8"
+        stroke="#4d0000"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    ),
+  },
+  {
+    color: "bg-[#febc2e]",
+    glyph: (
+      <path
+        d="M3.6 6h4.8"
+        stroke="#985600"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    ),
+  },
+  {
+    color: "bg-[#28c840]",
+    glyph: (
+      <>
+        <path d="M3.6 3.6h3.6L3.6 7.2z" fill="#006500" />
+        <path d="M8.4 8.4H4.8l3.6-3.6z" fill="#006500" />
+      </>
+    ),
+  },
+];
+
+/*
+  Grid de 3 columnas: [círculos] [URL] [vacío]
+  - Las columnas de los lados son 1fr → miden lo mismo → la URL queda
+    en el centro exacto de la card.
+  - La del centro mide lo que mide el texto (auto).
+  - Solo en pantallas muy angostas (ej. iPhone SE) la columna derecha
+    cede espacio para que la URL no se corte.
+*/
+function BrowserBar({ domain }) {
+  // "alexissanchez.vercel.app/quickcart" → host + "/quickcart"
+  const [host, ...rest] = domain.split("/");
+  const path = rest.length ? `/${rest.join("/")}` : "";
+
   return (
-    <svg
+    // Todo es decorativo: un solo aria-hidden en el contenedor basta
+    <div
       aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      className="
+        @container grid h-10 items-center gap-2 border-b border-black/[0.06] px-3
+        grid-cols-[minmax(max-content,1fr)_minmax(0,auto)_minmax(0,1fr)]
+        bg-linear-to-b from-[#fbfbfd] to-[#efeff1]
+      "
     >
-      {external ? (
-        <path d="M7 17 17 7M8 7h9v9" />
-      ) : (
-        <path d="M5 12h14M13 6l6 6-6 6" />
-      )}
-    </svg>
+      {/* Círculos rojo / amarillo / verde (más chicos en cards angostas) */}
+      <div className="flex gap-1 @[400px]:gap-1.5">
+        {trafficLights.map(({ color, glyph }, i) => (
+          <span
+            key={i}
+            className={`grid size-2.5 place-items-center rounded-full ${color} ring-1 ring-inset ring-black/[0.12] @[400px]:size-3`}
+          >
+            <svg viewBox="0 0 12 12" className="size-full">
+              {glyph}
+            </svg>
+          </span>
+        ))}
+      </div>
+
+      {/* Barra de dirección: mide lo que mide el texto */}
+      <div
+        className="
+          flex h-6 min-w-0 items-center justify-center gap-1.5 rounded-md
+          bg-white px-2.5 ring-1 ring-black/[0.06]
+          shadow-[0_1px_2px_rgba(0,0,0,0.06)]
+        "
+      >
+        {/* Candado: solo cuando hay espacio de sobra */}
+        <svg
+          viewBox="0 0 24 24"
+          className="hidden size-3 shrink-0 text-[#6e6e73] @[440px]:block"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="5" y="11" width="14" height="10" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+
+        {/*
+          La letra se adapta al ancho de la barra (100cqi), entre 10px y 12px.
+          136px = espacio fijo (padding + círculos + huecos); 19 ≈ ancho de
+          34 caracteres, la URL más larga (alexissanchez.vercel.app/quickcart).
+        */}
+        <span className="min-w-0 truncate text-[length:clamp(10px,calc((100cqi_-_136px)/19),12px)] font-medium text-[#424245]">
+          {host}
+          {/* La ruta SIEMPRE se muestra: sin ella, /quickcart parecería tu portafolio */}
+          {path && <span className="text-[#6e6e73]">{path}</span>}
+        </span>
+      </div>
+
+      {/* La 3.ª columna queda vacía: equilibra a los círculos para centrar la URL */}
+    </div>
   );
 }
+
+/* ---------- Card ---------- */
+
+/*
+  Hover / foco (la imagen NO se escala, así no se corta nada):
+  - La card sube y su fondo pasa de gris a blanco
+  - Aparece una sombra neutra más profunda
+  - El círculo de la flecha se pone negro y la flecha se desliza hacia ↗
+  - "Visitar sitio" se subraya de izquierda a derecha
+  En Tailwind v4, hover: solo aplica en dispositivos con mouse,
+  así que en celular no se queda "pegado" al tocar.
+*/
+const cardClass = `
+  group relative flex h-full flex-col rounded-3xl bg-[#f5f5f7]
+  ring-1 ring-black/[0.06]
+  shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)]
+  transition duration-500 ease-apple
+  hover:bg-white
+  motion-safe:hover:-translate-y-1.5
+  motion-safe:focus-visible:-translate-y-1.5
+  before:pointer-events-none before:absolute before:inset-0 before:rounded-3xl
+  before:shadow-[0_30px_60px_-28px_rgba(0,0,0,0.28)]
+  before:opacity-0 before:transition-opacity before:duration-500
+  hover:before:opacity-100 focus-visible:before:opacity-100
+  focus-visible:bg-white focus-visible:outline-none
+  focus-visible:ring-2 focus-visible:ring-[#0066cc]
+  focus-visible:ring-offset-4 focus-visible:ring-offset-white
+`;
 
 function ProjectCard({ project, featured }) {
   const { title, subtitle, category, description, domain, image, href, cta } =
     project;
   const isInternal = href.startsWith("/");
 
-  const cardClass = `
-    group relative flex h-full flex-col rounded-[24px] bg-[#f5f5f7]
-    ring-1 ring-black/[0.06]
-    shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)]
-    transition-transform duration-500 ease-apple
-    motion-safe:hover:-translate-y-1
-    before:pointer-events-none before:absolute before:inset-0 before:rounded-[24px]
-    before:shadow-[0_28px_56px_-24px_rgba(0,0,0,0.25)]
-    before:opacity-0 before:transition-opacity before:duration-500
-    hover:before:opacity-100
-    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0066cc]
-    focus-visible:ring-offset-4 focus-visible:ring-offset-white
-  `;
-
   const content = (
     <>
       {/* Ventana tipo navegador */}
-      <div className="relative overflow-hidden rounded-t-[24px] border-b border-black/[0.06]">
-        <div className="flex h-10 items-center gap-3 border-b border-black/[0.06] bg-[#f5f5f7] px-4">
-          <div className="flex shrink-0 gap-1.5" aria-hidden="true">
-            <span className="h-3 w-3 rounded-full bg-[#ff5f57] ring-1 ring-inset ring-black/[0.12]" />
-            <span className="h-3 w-3 rounded-full bg-[#febc2e] ring-1 ring-inset ring-black/[0.12]" />
-            <span className="h-3 w-3 rounded-full bg-[#28c840] ring-1 ring-inset ring-black/[0.12]" />
-          </div>
+      <div className="overflow-hidden rounded-t-3xl border-b border-black/[0.06]">
+        <BrowserBar domain={domain} />
 
-          <div
-            aria-hidden="true"
-            className="
-              mx-auto flex h-6 min-w-0 max-w-[75%] items-center gap-1.5 rounded-md
-              bg-white px-3 ring-1 ring-black/[0.06]
-              shadow-[0_1px_2px_rgba(0,0,0,0.06)]
-            "
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className="h-3 w-3 shrink-0 text-[#515154]"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="5" y="11" width="14" height="10" rx="2" />
-              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-            </svg>
-            <span className="truncate text-xs font-medium text-[#424245]">
-              {domain}
-            </span>
-          </div>
-
-          <div className="w-[48px] shrink-0" aria-hidden="true" />
-        </div>
-
-        <div className="relative aspect-video overflow-hidden bg-[#f5f5f7]">
+        {/* La imagen nunca se escala: se ve completa siempre */}
+        <div className="relative aspect-video bg-[#e8e8ed]">
           <Image
             src={image}
             alt={`Vista previa del sitio web de ${title}`}
@@ -185,17 +258,13 @@ function ProjectCard({ project, featured }) {
                 ? "(min-width: 1024px) 500px, (min-width: 640px) 50vw, 100vw"
                 : "(min-width: 1024px) 330px, (min-width: 640px) 50vw, 100vw"
             }
-            className="
-              object-cover object-top
-              transition-transform duration-700 ease-apple
-              motion-safe:group-hover:scale-[1.03]
-            "
+            className="object-cover object-top"
           />
         </div>
       </div>
 
-      {/* Información */}
-      <div className="flex flex-1 flex-col rounded-b-[24px] bg-[#f5f5f7] px-6 pb-6 pt-5">
+      {/* Información (sin fondo propio: toma el de la card y cambia junto con ella) */}
+      <div className="flex flex-1 flex-col px-5 pb-5 pt-4 sm:px-6 sm:pb-6 sm:pt-5">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#0055b3]">
           {category}
         </p>
@@ -216,28 +285,51 @@ function ProjectCard({ project, featured }) {
 
         {/* mt-auto empuja el CTA al fondo para que todas las cards queden parejas */}
         <div className="mt-auto flex items-center justify-between gap-4 pt-6">
-          <span className="text-sm font-semibold text-[#0055b3] transition-colors duration-300 group-hover:text-[#003d82]">
+          <span
+            className="
+              relative text-sm font-semibold text-[#0055b3]
+              after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full
+              after:origin-left after:scale-x-0 after:bg-current
+              after:transition-transform after:duration-300 after:ease-apple
+              group-hover:after:scale-x-100 group-focus-visible:after:scale-x-100
+            "
+          >
             {cta}
           </span>
 
           <span
             aria-hidden="true"
             className="
-              flex h-9 w-9 shrink-0 items-center justify-center rounded-full
+              flex size-9 shrink-0 items-center justify-center rounded-full
               bg-white text-[#1d1d1f]
               shadow-[0_1px_2px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.04]
               transition-colors duration-300
-              group-hover:bg-[#0066cc] group-hover:text-white
-              group-focus-visible:bg-[#0066cc] group-focus-visible:text-white
+              group-hover:bg-[#1d1d1f] group-hover:text-white
+              group-focus-visible:bg-[#1d1d1f] group-focus-visible:text-white
             "
           >
-            <ArrowIcon external={!isInternal} />
+            <svg
+              viewBox="0 0 24 24"
+              className="
+                size-4 transition-transform duration-300 ease-apple
+                motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5
+                motion-safe:group-focus-visible:translate-x-0.5 motion-safe:group-focus-visible:-translate-y-0.5
+              "
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M7 17 17 7M8 7h9v9" />
+            </svg>
           </span>
         </div>
       </div>
     </>
   );
 
+  // Ruta interna → <Link> (navegación rápida de Next, misma pestaña)
   if (isInternal) {
     return (
       <Link href={href} className={cardClass}>
@@ -246,6 +338,7 @@ function ProjectCard({ project, featured }) {
     );
   }
 
+  // Sitio externo → pestaña nueva + aviso para lectores de pantalla
   return (
     <a
       href={href}
@@ -258,6 +351,8 @@ function ProjectCard({ project, featured }) {
     </a>
   );
 }
+
+/* ---------- Sección ---------- */
 
 export default function ProjectsSection() {
   const layout = getLayout(projects.length);
@@ -291,10 +386,7 @@ export default function ProjectsSection() {
       <ul className="mx-auto grid max-w-5xl grid-cols-1 gap-5 sm:grid-cols-4 lg:grid-cols-6 lg:gap-6">
         {projects.map((project, index) => (
           <li key={project.title} className={layout[index].className}>
-            <ProjectCard
-              project={project}
-              featured={layout[index].featured}
-            />
+            <ProjectCard project={project} featured={layout[index].featured} />
           </li>
         ))}
       </ul>

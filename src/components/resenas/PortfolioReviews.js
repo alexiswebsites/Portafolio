@@ -194,26 +194,22 @@ export default function PortfolioReviews({ abrirLogin, abrirSignup }) {
     <section
       id="resenas"
       aria-labelledby="resenas-title"
-      className="bg-white px-5 py-20 text-[#1d1d1f] sm:px-8 md:py-28"
+      className="bg-white px-5 pt-5 pb-8 text-[#1d1d1f] sm:px-6 md:py-1 lg:px-8"
     >
       {/* Encabezado */}
-      <header className="mx-auto max-w-3xl text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#0066cc]">
+      <header className="mx-auto max-w-2xl text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6e6e73]">
           Comentarios
         </p>
 
         <h2
           id="resenas-title"
-          className="
-            mt-4 text-balance
-            text-[length:clamp(2rem,6vw,3.5rem)]
-            font-semibold leading-[1.05] tracking-[-0.04em]
-          "
+          className="mt-3 text-balance text-3xl font-semibold tracking-tight md:text-5xl"
         >
           Opiniones de clientes
         </h2>
 
-        <p className="mx-auto mt-5 max-w-xl text-pretty text-[17px] leading-relaxed text-[#6e6e73] sm:text-xl">
+        <p className="mx-auto mt-4 max-w-xl text-pretty text-base leading-relaxed text-[#424245] md:text-lg">
           Experiencias reales sobre los sitios web que he desarrollado.
         </p>
 
@@ -221,14 +217,14 @@ export default function PortfolioReviews({ abrirLogin, abrirSignup }) {
           type="button"
           onClick={abrirFormulario}
           aria-expanded={formAbierto}
-          className={`${btnPrimary} mt-8 w-full sm:w-auto sm:px-7`}
+          className={`${btnPrimary} mt-6 w-full sm:w-auto sm:px-7`}
         >
           Dejar comentario
         </button>
       </header>
 
       {/* Estado de sesión */}
-      <div aria-live="polite" className={`${panelClass} mt-12 p-5 sm:p-6`}>
+      <div aria-live="polite" className={`${panelClass} mt-10 p-4 sm:p-5`}>
         {loadingUser ? (
           <div className="space-y-2">
             <span className="sr-only">Verificando sesión…</span>
@@ -242,10 +238,10 @@ export default function PortfolioReviews({ abrirLogin, abrirSignup }) {
             />
           </div>
         ) : user ? (
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-sm text-[#6e6e73]">Sesión iniciada como</p>
-              <p className="truncate text-lg font-semibold tracking-[-0.01em]">
+              <p className="truncate text-base font-semibold tracking-[-0.01em]">
                 {nombreCuentaVisual}
               </p>
               <p className="mt-0.5 text-sm text-[#6e6e73]">
@@ -263,9 +259,9 @@ export default function PortfolioReviews({ abrirLogin, abrirSignup }) {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-base font-semibold">
+              <p className="text-[15px] font-semibold">
                 Inicia sesión para dejar un comentario.
               </p>
               <p className="mt-0.5 text-sm text-[#6e6e73]">
@@ -308,7 +304,7 @@ export default function PortfolioReviews({ abrirLogin, abrirSignup }) {
       )}
 
       {/* Lista de comentarios: siempre centrada, sin importar cuántas cards haya */}
-      <div aria-busy={loadingResenas} className="mx-auto mt-14 max-w-5xl">
+      <div aria-busy={loadingResenas} className="mx-auto mt-10 max-w-5xl">
         {loadingResenas ? (
           <div className="flex flex-wrap justify-center gap-5">
             <span className="sr-only">Cargando comentarios…</span>
@@ -316,7 +312,7 @@ export default function PortfolioReviews({ abrirLogin, abrirSignup }) {
               <div
                 key={item}
                 aria-hidden="true"
-                className={`${itemClass} rounded-[28px] bg-white p-7 ring-1 ring-black/[0.08] motion-safe:animate-pulse sm:p-9`}
+                className={`${itemClass} rounded-3xl bg-white p-6 ring-1 ring-black/[0.08] motion-safe:animate-pulse sm:p-7`}
               >
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-28 rounded-full bg-black/[0.05]" />
@@ -326,15 +322,15 @@ export default function PortfolioReviews({ abrirLogin, abrirSignup }) {
                   <div className="h-3 w-32 rounded-full bg-black/[0.05]" />
                   <div className="h-4 w-28 rounded-full bg-black/[0.07]" />
                 </div>
-                <div className="mt-8 h-4 w-full rounded-full bg-black/[0.06]" />
+                <div className="mt-6 h-4 w-full rounded-full bg-black/[0.06]" />
                 <div className="mt-3 h-4 w-[88%] rounded-full bg-black/[0.06]" />
                 <div className="mt-3 h-4 w-[64%] rounded-full bg-black/[0.06]" />
               </div>
             ))}
           </div>
         ) : resenas.length === 0 ? (
-          <div className="mx-auto max-w-3xl rounded-[28px] bg-white px-6 py-16 text-center ring-1 ring-black/[0.08]">
-            <p className="text-xl font-semibold tracking-[-0.02em]">
+          <div className="mx-auto max-w-3xl rounded-3xl bg-white px-6 py-12 text-center ring-1 ring-black/[0.08]">
+            <p className="text-lg font-semibold tracking-[-0.02em]">
               Todavía no hay comentarios.
             </p>
             <p className="mx-auto mt-2 max-w-md text-sm text-[#6e6e73]">

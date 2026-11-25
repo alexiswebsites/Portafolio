@@ -27,7 +27,7 @@ export default function ContactSection() {
           Contacto
         </p>
 
-        <h2 className="mt-3 text-3xl font-semibold leading-tight text-[#1d1d1f] md:text-5xl">
+        <h2 className="mt-3 text-3xl font-semibold leading-tight text-[#1d1d1f] md:text-4xl">
           ¿Necesitas una página o sistema web?
         </h2>
 

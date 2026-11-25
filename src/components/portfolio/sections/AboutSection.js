@@ -56,9 +56,9 @@ export default function AboutSection() {
       aria-labelledby="about-title"
       className="
         bg-white text-[#1d1d1f]
-        px-5 py-16
+        px-5 py-8
         sm:px-8 sm:py-20
-        lg:py-28
+        lg:py-1
       "
     >
       <div className="mx-auto max-w-5xl">
@@ -116,7 +116,7 @@ export default function AboutSection() {
             tracking-[0.22em] text-[#6e6e73]
           "
         >
-          Tecnologías y herramientas
+          Stack
         </p>
 
         <h3
@@ -125,7 +125,7 @@ export default function AboutSection() {
             font-semibold tracking-[-0.025em]
           "
         >
-          Herramientas con las que trabajo
+          Tecnologías con las que trabajo
         </h3>
 
         <ul

@@ -1,6 +1,6 @@
 export default function PortfolioFooter() {
   return (
-    <footer className="bg-white px-6 py-8 text-center text-sm text-[#6e6e73]">
+    <footer className="bg-white px-6 py-4 text-center text-sm text-[#6e6e73]">
       <p>© 2026 Miguel Alexis Sánchez Carranza.</p>
 
       <div className="mt-3 space-y-1">

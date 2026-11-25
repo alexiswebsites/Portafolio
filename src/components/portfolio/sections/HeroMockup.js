@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { memo, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { FaPause, FaPlay } from "react-icons/fa";
 
 /* ---------- Preferencia "reducir movimiento" del sistema ---------- */
@@ -17,13 +17,15 @@ const getServerSnapshot = () => false;
 /* ---------- Clases reutilizables ---------- */
 const range = (n) => Array.from({ length: n }, (_, i) => i);
 
-// Mismo tamaño y giro para la laptop y la capa del botón → siempre alineados
+// Mismo tamaño y giro para la laptop y el botón → siempre alineados
 const LAPTOP_BOX = "relative mx-auto w-[96%] max-w-[690px] -rotate-[1.5deg]";
 const LAPTOP_FRAME =
   "border border-white/40 bg-gradient-to-br from-[#8e8e93] via-[#5a5a5e] to-[#3a3a3c]";
 const PHONE_FRAME =
   "border border-white/70 bg-gradient-to-br from-[#c7c7cc] via-[#9a9a9f] to-[#6e6e73]";
-const SCREEN = "relative overflow-hidden bg-[#2c2c2e] [contain:paint]";
+// container-type:size → el hero mide 100% del alto de la pantalla (cqh)
+// contain:strict → nada de adentro obliga a recalcular el resto de la página
+const SCREEN = "relative overflow-hidden bg-[#2c2c2e] [container-type:size] [contain:strict]";
 const CARD = "border border-white/10 bg-white/[0.06]";
 const MEDIA_CARD = "overflow-hidden border border-white/10 bg-[#3a3a3c]";
 const IMG =
@@ -33,6 +35,12 @@ const CTA_BG =
 const NAV = "flex items-center justify-between border-b border-white/10 bg-[#3a3a3c]";
 const DOTS = ["bg-white/80", "bg-white/45", "bg-white/25"];
 
+// Capas animadas: se quedan en la GPU y no se vuelven a pintar en cada frame
+const GPU_LAYER = "will-change-transform [backface-visibility:hidden]";
+
+// Si el hero sale de pantalla, se pausan TODAS las animaciones de adentro
+const PAUSE_OFFSCREEN = "[&[data-inview=false]_*]:[animation-play-state:paused]!";
+
 const OVERLAYS = {
   laptop:
     "bg-[linear-gradient(120deg,rgba(255,255,255,0.12),transparent_28%,transparent_70%,rgba(255,255,255,0.04))] shadow-[inset_0_0_25px_rgba(0,0,0,0.4)]",
@@ -40,80 +48,63 @@ const OVERLAYS = {
     "bg-[linear-gradient(120deg,rgba(255,255,255,0.12),transparent_30%,transparent_72%,rgba(255,255,255,0.04))] shadow-[inset_0_0_14px_rgba(0,0,0,0.4)]",
 };
 
+/* ---------- Hook: ¿el elemento está cerca de la pantalla? ---------- */
+// Escribe data-inview directo en el DOM → no provoca re-renders de React
+function useInViewAttr(ref, rootMargin = "300px 0px") {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !("IntersectionObserver" in window)) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        el.dataset.inview = entry.isIntersecting ? "true" : "false";
+      },
+      { rootMargin }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref, rootMargin]);
+}
+
 /* ---------- Componente principal ---------- */
 export default function HeroMockup() {
+  const rootRef = useRef(null);
+  useInViewAttr(rootRef);
+
   const prefersReduced = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   // null = el usuario aún no elige → se respeta la preferencia del sistema
   const [userPaused, setUserPaused] = useState(null);
   const paused = userPaused ?? prefersReduced;
   const motion = userPaused === null ? "auto" : userPaused ? "paused" : "running";
 
+  // Un solo manejador para todo el mockup (el clic del botón también llega aquí)
+  const toggle = useCallback(
+    () => setUserPaused((prev) => !(prev ?? prefersReduced)),
+    [prefersReduced]
+  );
+
   return (
     <div
+      ref={rootRef}
       data-motion={motion}
-      className="relative mx-auto flex w-full items-center justify-center"
+      className={`relative mx-auto flex w-full items-center justify-center ${PAUSE_OFFSCREEN}`}
     >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-1/2 h-[75%] w-[80%] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(closest-side,rgba(203,213,225,0.2)_45%,rgba(203,213,225,0.08)_72%,transparent)]"
       />
 
-      {/* Contenedor que flota: mueve dispositivos y botón como una sola pieza */}
-      <div className="mockup-float relative mx-auto w-[90%]">
+      {/* Contenedor que flota. Clic en cualquier parte → pausa/reanuda */}
+      <div
+        onClick={toggle}
+        className={`group/mockup mockup-float relative mx-auto w-[90%] cursor-pointer select-none ${GPU_LAYER}`}
+      >
+        {/* Se eleva con hover y se hunde al presionar (solo transform → barato) */}
         <div
-          role="img"
-          aria-label="Vista previa de un sitio web en laptop y celular"
-          className="relative"
+          className={`transition-transform duration-300 ease-out group-hover/mockup:-translate-y-1.5 group-active/mockup:translate-y-0.5 group-active/mockup:duration-100 motion-reduce:transition-none ${GPU_LAYER}`}
         >
-          {/* Laptop */}
-          <div className={LAPTOP_BOX}>
-            <div
-              className={`relative overflow-hidden rounded-[18px] p-[5px] shadow-[0_10px_24px_rgba(0,0,0,0.12),0_0_28px_rgba(148,163,184,0.10)] sm:rounded-[24px] sm:p-[7px] ${LAPTOP_FRAME}`}
-            >
-              <div className="absolute left-1/2 top-[3px] z-30 h-[3px] w-[3px] -translate-x-1/2 rounded-full bg-white/40 sm:top-[4px]" />
-
-              <div className={`aspect-[16/10] rounded-[13px] sm:rounded-[18px] ${SCREEN}`}>
-                <DesktopScreen />
-                <ScreenOverlay variant="laptop" />
-              </div>
-            </div>
-          </div>
-
-          {/* Celular (resaltado sobre la laptop) */}
-          <div className="absolute bottom-[-3%] right-[1%] z-30 w-[25%] min-w-[92px] max-w-[175px] rotate-[2.5deg] sm:right-[2%]">
-            <div
-              className={`relative rounded-[22px] p-[4px] shadow-[-10px_12px_24px_rgba(0,0,0,0.35),0_0_0_1px_rgba(0,0,0,0.12)] sm:rounded-[32px] sm:p-[6px] ${PHONE_FRAME}`}
-            >
-              <div className="absolute -left-[3px] top-[22%] h-[13%] w-[3px] rounded-l bg-[#9a9a9f]" />
-              <div className="absolute -left-[3px] top-[38%] h-[9%] w-[3px] rounded-l bg-[#9a9a9f]" />
-
-              <div className={`aspect-[9/19] rounded-[18px] sm:rounded-[26px] ${SCREEN}`}>
-                <div className="absolute left-1/2 top-[5px] z-40 h-[10px] w-[38%] -translate-x-1/2 rounded-full bg-[#1d1d1f] sm:top-[7px] sm:h-[14px]" />
-                <MobileScreen />
-                <ScreenOverlay variant="phone" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Capa del botón: mismo tamaño y giro que la laptop, fuera del role="img" */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className={`h-full ${LAPTOP_BOX}`}>
-            {/* Montado sobre la esquina: mitad dentro, mitad fuera */}
-            <button
-              type="button"
-              onClick={() => setUserPaused(!paused)}
-              aria-pressed={paused}
-              aria-label="Pausar animación"
-              className="pointer-events-auto absolute -bottom-3 -left-3 z-40 flex h-9 w-9 items-center justify-center rounded-full border border-[#d2d2d7] bg-white text-[#1d1d1f] shadow-[0_4px_12px_rgba(0,0,0,0.18)] transition-colors duration-200 hover:bg-[#f5f5f7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0071e3]"
-            >
-              {paused ? (
-                <FaPlay aria-hidden="true" className="ml-0.5 text-[11px]" />
-              ) : (
-                <FaPause aria-hidden="true" className="text-[11px]" />
-              )}
-            </button>
-          </div>
+          <Devices />
+          <PauseButton paused={paused} />
         </div>
       </div>
     </div>
@@ -121,13 +112,75 @@ export default function HeroMockup() {
 }
 
 /* ---------- Subcomponentes ---------- */
+
+// Botón real: da accesibilidad (teclado, lector de pantalla).
+// No tiene onClick propio: su clic "sube" (burbujea) al contenedor → un solo toggle.
+function PauseButton({ paused }) {
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <div className={`h-full ${LAPTOP_BOX}`}>
+        {/* Montado sobre la esquina: mitad dentro, mitad fuera */}
+        <button
+          type="button"
+          aria-pressed={paused}
+          aria-label="Pausar animación"
+          className="pointer-events-auto absolute -bottom-3 -left-3 z-40 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#d2d2d7] bg-white text-[#1d1d1f] shadow-[0_4px_12px_rgba(0,0,0,0.18)] transition-[background-color,transform] duration-200 hover:bg-[#f5f5f7] group-hover/mockup:scale-110 group-active/mockup:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0071e3] motion-reduce:transition-none"
+        >
+          {paused ? (
+            <FaPlay aria-hidden="true" className="ml-0.5 text-[11px]" />
+          ) : (
+            <FaPause aria-hidden="true" className="text-[11px]" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// memo: al pausar NO se vuelven a renderizar laptop, celular ni sus pantallas
+const Devices = memo(function Devices() {
+  return (
+    <div role="img" aria-label="Vista previa de un sitio web en laptop y celular" className="relative">
+      {/* Laptop */}
+      <div className={LAPTOP_BOX}>
+        <div
+          className={`relative overflow-hidden rounded-[18px] p-[5px] shadow-[0_10px_24px_rgba(0,0,0,0.12),0_0_28px_rgba(148,163,184,0.10)] sm:rounded-[24px] sm:p-[7px] ${LAPTOP_FRAME}`}
+        >
+          <div className="absolute left-1/2 top-[3px] z-30 h-[3px] w-[3px] -translate-x-1/2 rounded-full bg-white/40 sm:top-[4px]" />
+
+          <div className={`aspect-[16/10] rounded-[13px] sm:rounded-[18px] ${SCREEN}`}>
+            <DesktopScreen />
+            <ScreenOverlay variant="laptop" />
+          </div>
+        </div>
+      </div>
+
+      {/* Celular (resaltado sobre la laptop) */}
+      <div className="absolute bottom-[-3%] right-[1%] z-30 w-[25%] min-w-[92px] max-w-[175px] rotate-[2.5deg] sm:right-[2%]">
+        <div
+          className={`relative rounded-[22px] p-[4px] shadow-[-10px_12px_24px_rgba(0,0,0,0.35),0_0_0_1px_rgba(0,0,0,0.12)] sm:rounded-[32px] sm:p-[6px] ${PHONE_FRAME}`}
+        >
+          <div className="absolute -left-[3px] top-[22%] h-[13%] w-[3px] rounded-l bg-[#9a9a9f]" />
+          <div className="absolute -left-[3px] top-[38%] h-[9%] w-[3px] rounded-l bg-[#9a9a9f]" />
+
+          <div className={`aspect-[9/19] rounded-[18px] sm:rounded-[26px] ${SCREEN}`}>
+            <div className="absolute left-1/2 top-[5px] z-40 h-[10px] w-[38%] -translate-x-1/2 rounded-full bg-[#1d1d1f] sm:top-[7px] sm:h-[14px]" />
+            <MobileScreen />
+            <ScreenOverlay variant="phone" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 function ScreenOverlay({ variant }) {
   return <div className={`pointer-events-none absolute inset-0 ${OVERLAYS[variant]}`} />;
 }
 
 function DesktopScreen() {
   return (
-    <div className="desktop-screen-scroll absolute inset-x-0 top-0">
+    <div className={`desktop-screen-scroll absolute inset-x-0 top-0 ${GPU_LAYER}`}>
       {/* Navbar */}
       <div className={`h-10 px-4 sm:h-14 sm:px-6 ${NAV}`}>
         <div className="flex items-center gap-1.5">
@@ -141,8 +194,8 @@ function DesktopScreen() {
         </div>
       </div>
 
-      {/* Hero */}
-      <div className="grid min-h-[210px] grid-cols-[1.1fr_0.9fr] items-center gap-4 bg-[radial-gradient(circle_at_25%_30%,rgba(255,255,255,0.12),transparent_42%),#333335] px-5 py-7 sm:min-h-[330px] sm:gap-8 sm:px-9 sm:py-12">
+      {/* Hero: 100% del alto de la pantalla menos la navbar */}
+      <div className="grid h-[calc(100cqh-2.5rem)] grid-cols-[1.1fr_0.9fr] items-center gap-4 overflow-hidden bg-[radial-gradient(circle_at_25%_30%,rgba(255,255,255,0.12),transparent_42%),#333335] px-5 sm:h-[calc(100cqh-3.5rem)] sm:gap-8 sm:px-9">
         <div>
           <div className="h-2 w-16 rounded-full bg-white/55 sm:h-3 sm:w-24" />
           <div className="mt-4 h-5 w-[88%] rounded bg-white/90 sm:h-8" />
@@ -152,7 +205,7 @@ function DesktopScreen() {
           <div className="mt-5 h-6 w-20 rounded-full bg-[#e5e5ea] shadow-[0_8px_20px_rgba(255,255,255,0.12)] sm:h-9 sm:w-28" />
         </div>
 
-        <div className="relative aspect-square rounded-[18px] border border-white/20 bg-gradient-to-br from-white/20 to-white/[0.04] shadow-[inset_0_0_35px_rgba(255,255,255,0.06)] sm:rounded-[28px]">
+        <div className="relative aspect-square max-h-[85%] rounded-[18px] border border-white/20 bg-gradient-to-br from-white/20 to-white/[0.04] shadow-[inset_0_0_35px_rgba(255,255,255,0.06)] sm:rounded-[28px]">
           <div className="absolute inset-[14%] rounded-[14px] border border-white/10 bg-[#3a3a3c] sm:rounded-[22px]">
             <div className="absolute left-[10%] top-[15%] h-[8%] w-[45%] rounded-full bg-[#e5e5ea]" />
             <div className="absolute left-[10%] top-[34%] h-[5%] w-[70%] rounded-full bg-white/20" />
@@ -208,7 +261,7 @@ function DesktopScreen() {
 
 function MobileScreen() {
   return (
-    <div className="mobile-screen-scroll absolute inset-x-0 top-0">
+    <div className={`mobile-screen-scroll absolute inset-x-0 top-0 ${GPU_LAYER}`}>
       {/* Navbar */}
       <div className={`h-8 px-3 sm:h-11 ${NAV}`}>
         <div className="flex flex-col gap-[2px]">
@@ -219,8 +272,8 @@ function MobileScreen() {
         <span className="h-1.5 w-7 rounded-full bg-white/55 sm:h-2 sm:w-9" />
       </div>
 
-      {/* Hero */}
-      <div className="flex min-h-[170px] flex-col justify-center bg-[radial-gradient(circle_at_50%_25%,rgba(255,255,255,0.14),transparent_50%),#333335] px-3 py-7 sm:min-h-[245px] sm:px-5">
+      {/* Hero: 100% del alto de la pantalla menos la navbar */}
+      <div className="flex h-[calc(100cqh-2rem)] flex-col justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_25%,rgba(255,255,255,0.14),transparent_50%),#333335] px-3 sm:h-[calc(100cqh-2.75rem)] sm:px-5">
         <div className="h-1.5 w-10 rounded-full bg-white/55 sm:h-2 sm:w-14" />
         <div className="mt-3 h-4 w-[90%] rounded bg-white/85 sm:h-6" />
         <div className="mt-1.5 h-4 w-[68%] rounded bg-white/45 sm:h-6" />

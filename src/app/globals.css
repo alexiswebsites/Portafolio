@@ -52,8 +52,29 @@ body {
 }
 
 /* ================================= */
+/* ENTRADA DE TODA LA WEB            */
+/* Al entrar o refrescar cualquier   */
+/* página, todo aparece suavemente.  */
+/* Solo opacidad: un transform en el */
+/* body rompería los elementos       */
+/* position: fixed (navbar, botón    */
+/* de WhatsApp, etc.)                */
+/* ================================= */
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+}
+
+body,
+.page-in {
+  animation: page-in 500ms var(--ease-apple) both;
+}
+
+/* ================================= */
 /* ANIMACIÓN DE ENTRADA AL CARGAR    */
-/* Solo Hero y navbar                */
+/* Hero y navbar (suben + aparecen)  */
 /* Uso: className="fade"             */
 /* Retraso: className="fade [--delay:150ms]" */
 /* ================================= */
