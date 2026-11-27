@@ -14,6 +14,9 @@ const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   Todos los espacios y tamaños usan vh (1vh = 1% de la altura de la pantalla)
   dentro de clamp() → se adaptan a pantallas altas o bajas sin pasarse
   de un mínimo ni de un máximo.
+
+  En móvil: mockup + texto forman un solo bloque centrado verticalmente
+  (content-center), así el texto queda pegado al mockup y no al borde de abajo.
 */
 export default function HeroSection() {
   return (
@@ -28,8 +31,8 @@ export default function HeroSection() {
       <div
         className="
           mx-auto grid h-full min-h-0 w-full max-w-7xl
-          grid-rows-[minmax(0,1fr)_auto]
-          items-center
+          grid-rows-[minmax(0,auto)_auto]
+          content-center items-center
           gap-[clamp(0.5rem,2.5vh,1.5rem)]
           px-4
           pb-[clamp(1.25rem,5vh,3rem)]
@@ -124,9 +127,9 @@ export default function HeroSection() {
         <div
           className="
             fade [--delay:90ms]
-            order-1 flex h-full min-h-0 w-full min-w-0
+            order-1 flex min-h-0 w-full min-w-0
             items-center justify-center
-            lg:order-2
+            lg:order-2 lg:h-full
           "
         >
           <div className="w-full max-w-[68vh] lg:max-w-[760px]">

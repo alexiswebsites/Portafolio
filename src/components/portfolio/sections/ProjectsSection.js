@@ -30,7 +30,7 @@ const projects = [
     category: "Tienda de electrónica",
     description:
       "Tienda online de demostración con catálogo de productos electrónicos por categorías, carrito de compras y flujo de pedido simulado.",
-    domain: "alexissanchez.vercel.app/quickcart",
+    domain: "alexiswebsites.com.mx/quickcart",
     image: "/images/proyectos/heroquickcart.png",
     href: "/quickcart",
     cta: "Visitar sitio",
